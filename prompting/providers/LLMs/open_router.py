@@ -31,7 +31,7 @@ class OpenRouterProvider(Provider):
                     response_format=response_format
                 )
                 print("response:",response)
-            return self.validate_response(response)
+            return self.transform_response(response)
         except Exception as e:
             import traceback
             traceback.print_exc()

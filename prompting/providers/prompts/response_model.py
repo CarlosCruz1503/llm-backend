@@ -1,8 +1,4 @@
-
-from gettext import textdomain
-from tkinter import W
-from pydantic import BaseModel,Field, ConfigDict
-from typing import List, Optional
+from pydantic import BaseModel, Field, ConfigDict
 from enum import Enum
 
 class Category(str, Enum):

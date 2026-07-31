@@ -20,10 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-*@@ds40n#ky_v+e18q)d_sqc)3i&*l$i$9k3k0gn4%oo-wyj3="
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure-*@@ds40n#ky_v+e18q)d_sqc)3i&*l$i$9k3k0gn4%oo-wyj3="
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', '0') == '1'
 
 ALLOWED_HOSTS = []
 
@@ -49,15 +51,12 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    # 'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-    # ],
 }
 
 # Configure Spectacular settings
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Blog API',
-    'DESCRIPTION': 'API for managing blog posts, comments, and categories',
+    'TITLE': 'LLM Prompting API',
+    'DESCRIPTION': 'API for routing prompts to LLM providers (Gemini, OpenRouter) with structured output',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
@@ -94,15 +93,6 @@ WSGI_APPLICATION = "myapp.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
-
-DEBUG = os.environ.get('DEBUG', '0') == '1'
 
 DATABASES = {
     "default": {
