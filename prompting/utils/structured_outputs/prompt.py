@@ -24,7 +24,6 @@ class Classification(str, Enum):
     
     
 class SummarizeOutputModel(BaseModel):
-    model_config = ConfigDict(extra="forbid")
 
     text: str = Field(description="The summary of the the text")
     category: Category = Field(description="The category of the the text")

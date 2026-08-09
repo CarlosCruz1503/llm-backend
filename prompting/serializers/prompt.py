@@ -1,9 +1,15 @@
-from rest_framework import serializers
-from ..models import PromptModel
-from ..services.client import create_client, save_client_reponse
+import logging
 
-class PromptSerializers(serializers.ModelSerializer):
-    
+from myapp.serializers.base import BaseSerializer
+
+from ..models import PromptModel
+from ..services.client import create_client_for_prompt, save_client_reponse_for_prompt
+
+logger = logging.getLogger(__name__)
+
+
+class PromptSerializers(BaseSerializer):
+
     class Meta:
         model = PromptModel
         fields = "__all__"
@@ -13,16 +19,22 @@ class PromptSerializers(serializers.ModelSerializer):
             'provider': {'required': True, 'allow_null': False},
             'thinking_level': {'required': True, 'allow_null': False}
         }
-    
+        # Populated by the backend after calling the LLM provider, never by
+        # the client (mass-assignment guard, same reasoning as MessageSerializer).
+        read_only_fields = [
+            "output", "output_dict", "error", "response_code", "status",
+            "request_id", "model", "input_tokens", "output_tokens", "total_tokens",
+        ]
+
     def create(self, validated_data):
         prompt = PromptModel.objects.create(**validated_data)
 
         try:
-            client = create_client(validated_data)
+            client = create_client_for_prompt(validated_data)
             response = client.execute()
-            prompt = save_client_reponse(response, prompt)
+            prompt = save_client_reponse_for_prompt(response, prompt)
         except Exception as e:
-            print(f"Error {e}")
+            logger.exception("Failed to get a response from the LLM provider")
             prompt.error = f"Error: {e}"
 
         prompt.save()

@@ -17,16 +17,33 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
-from rest_framework.routers import DefaultRouter
-from prompting.views import PromptView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-router = DefaultRouter()
-router.register("prompt", PromptView, basename="prompt")
+from rest_framework.throttling import ScopedRateThrottle
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.conf import settings
+from django.conf.urls.static import static
+
+class ThrottledTokenObtainPairView(TokenObtainPairView):
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "token_obtain"
+
+
+class ThrottledTokenRefreshView(TokenRefreshView):
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "token_obtain"
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include(router.urls)),
+    path("api/", include("prompting.urls")),
+    path("api/", include("chat.urls")),
+    path("api/", include("rag.urls")),
+    # Submit username/password to get 'access' and 'refresh' tokens
+    path('api/token/', ThrottledTokenObtainPairView.as_view(), name='token_obtain_pair'),
+
+    # Submit 'refresh' token to get a new 'access' token
+    path('api/token/refresh/', ThrottledTokenRefreshView.as_view(), name='token_refresh'),
      # Swagger UI endpoints
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-]
+]  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

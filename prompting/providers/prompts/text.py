@@ -1,6 +1,11 @@
 from enum import Enum
-from .response_model import SummarizeOutputModel, classifyOutputModel,keyWordsOutputModel
+
 from pydantic import BaseModel
+from prompting.utils.structured_outputs.prompt import (
+    SummarizeOutputModel,
+    classifyOutputModel,
+    keyWordsOutputModel
+)
 
 class PromptType(str, Enum):
     SUMMARIZE = "summarize"
