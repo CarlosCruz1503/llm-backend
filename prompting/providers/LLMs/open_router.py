@@ -5,41 +5,54 @@ from typing import Dict
 from django.core.exceptions import ImproperlyConfigured
 from openrouter import OpenRouter
 
-from ...constants import OPENROUTER_API_KEY, OPENROUTER_MODEL, SYSTEM_INSTRUCTION_FOR_CHAT
+from ...constants import DEFAULT_EMBEDDING_DIMENTIONS, OPENROUTER_API_KEY, OPENROUTER_EMBEDDING_MODEL, OPENROUTER_MODEL, SYSTEM_INSTRUCTION_FOR_CHAT
 from ..base import ChatProvider
 
 logger = logging.getLogger(__name__)
 class OpenRouterProvider(ChatProvider):
 
     model: str = OPENROUTER_MODEL
+    embedding_model = OPENROUTER_EMBEDDING_MODEL
 
-    def __init__(self, thinking_level, input, output_type, conversation=None):
-        super().__init__(thinking_level, input, output_type, conversation)
+    def __init__(self, input, thinking_level="", output_type="", conversation=None, top_k=None):
+        super().__init__(input,thinking_level, output_type, conversation,top_k)
         if not self.model or not OPENROUTER_API_KEY:
             raise ImproperlyConfigured(
                 "OPENROUTER_MODEL / OPENROUTER_API_KEY environment variables are not set; "
                 "the OpenRouter provider cannot run."
             )
 
-    def build_message(self, is_chat):
+    def build_search_content(self):
+        
+        return [
+            {"role": "user", 
+             "content": f"Answer the question or search {self.input} based on this top_k rag chunks {json.dumps(self.top_k, indent=2)}"},
+        ]
+        
+    def build_message(self, is_chat, is_search):
         message = [
             {"role": "user", "content": self.input},
         ]
-        if not is_chat:
+        if not is_chat and not is_search:
             message.append({"role": "system", "content": self.output_type.prompt})
         return message
 
-    def build_context(self, is_chat):
-        message = self.build_message(is_chat)
+    def build_context(self, is_chat, is_search):
+        message = self.build_message(is_chat, is_search)
 
-        if not is_chat:
-            return message
+        if is_chat:
+            history = self.retrieve_chat_history(self.conversation)
+            system_message = [{"role": "system", "content": SYSTEM_INSTRUCTION_FOR_CHAT}]
+            return [*system_message, *history, *message]
+        if is_search:
+            return self.build_search_content()
+            
+        return message
 
-        history = self.retrieve_chat_history(self.conversation)
-        system_message = [{"role": "system", "content": SYSTEM_INSTRUCTION_FOR_CHAT}]
-        return [*system_message, *history, *message]
+        
 
-    def execute(self, is_chat=False):
+
+    def execute(self, is_chat=False, is_search=False):
         try:
             response_format = {
                 "type": "json_schema",
@@ -51,7 +64,7 @@ class OpenRouterProvider(ChatProvider):
             with OpenRouter(api_key=OPENROUTER_API_KEY) as open_router:
                 response = open_router.chat.send(
                     model=self.model,
-                    messages=self.build_context(is_chat),
+                    messages=self.build_context(is_chat, is_search),
                     response_format=response_format
                 )
             return self.transform_response(response)
@@ -87,3 +100,17 @@ class OpenRouterProvider(ChatProvider):
             }
             for message in history
         ]
+
+    def embed_content(self):
+        try: 
+            with OpenRouter(api_key=OPENROUTER_API_KEY) as open_router:
+                response = open_router.embeddings.generate(
+                    model=self.embedding_model,
+                    input=self.input,
+                    dimensions=DEFAULT_EMBEDDING_DIMENTIONS
+                )
+            
+            return response.data[0].embedding
+        except Exception:
+            logger.exception("Failed to generate openrouter embedding")
+            raise

@@ -19,8 +19,8 @@ services:
     #   - POSTGRES_PORT=5432
     # Wait for the database to pass its healthcheck before starting the web service.
     depends_on:
-      db:
-        condition: service_healthy
+      - db
+      - redis
     volumes:
       # Bind mount the repo so changes made on either side (host editor or
       # `docker exec`, e.g. startapp/makemigrations) show up on both.
@@ -37,7 +37,7 @@ services:
     #     - action: rebuild
     #       path: uv.lock
   db:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16 
     restart: always
     volumes:
       # Persist database data across container restarts.
@@ -57,5 +57,81 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  redis:
+    image: redis:7-alpine
+
+  celery_worker:
+    build:
+      context: .
+      target: develop
+    image: django_celery_celery_worker
+    command: /start-celeryworker
+    volumes:
+      - .:/app
+      # See web's volumes above: without this, the bind mount hides the
+      # image's own .venv (built for python:3.10-bullseye) behind the host's
+      # (built for a different Python), and imports like psycopg fail.
+      - /app/.venv
+    environment:
+      # Unlike `web` (started via manage.py, which defaults this itself), the
+      # bare `celery` CLI needs DJANGO_SETTINGS_MODULE set explicitly before
+      # it can load django.conf.settings.
+      - DJANGO_SETTINGS_MODULE=myapp.settings
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - db
+
+  celery_beat:
+    build:
+      context: .
+      target: develop
+    image: django_celery_celery_beat
+    command: /start-celerybeat
+    volumes:
+      - .:/app
+      # See web's volumes above: without this, the bind mount hides the
+      # image's own .venv (built for python:3.10-bullseye) behind the host's
+      # (built for a different Python), and imports like psycopg fail.
+      - /app/.venv
+    environment:
+      # Unlike `web` (started via manage.py, which defaults this itself), the
+      # bare `celery` CLI needs DJANGO_SETTINGS_MODULE set explicitly before
+      # it can load django.conf.settings.
+      - DJANGO_SETTINGS_MODULE=myapp.settings
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - db
+
+  flower:
+    build:
+      context: .
+      target: develop
+    image: django_celery_celery_flower
+    command: /start-flower
+    volumes:
+      - .:/app
+      # See web's volumes above: without this, the bind mount hides the
+      # image's own .venv (built for python:3.10-bullseye) behind the host's
+      # (built for a different Python), and imports like psycopg fail.
+      - /app/.venv
+    environment:
+      # Unlike `web` (started via manage.py, which defaults this itself), the
+      # bare `celery` CLI needs DJANGO_SETTINGS_MODULE set explicitly before
+      # it can load django.conf.settings.
+      - DJANGO_SETTINGS_MODULE=myapp.settings
+    env_file:
+      - .env
+    ports:
+      - 5557:5555
+    depends_on:
+      - redis
+      - db
+
+    
 volumes:
   db-data:

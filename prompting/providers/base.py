@@ -10,17 +10,19 @@ logger = logging.getLogger(__name__)
 
 class Provider(ABC):
 
+    input: str
     thinking_level: str
     output_type: str
-    input: str
     conversation: int = None
+    top_k: list = None
     client: Any
 
-    def __init__(self, thinking_level, input, output_type, conversation=None):
+    def __init__(self, input, thinking_level="", output_type="", conversation=None, top_k=None):
         self.thinking_level = thinking_level
         self.input = input
         self.output_type = output_type
         self.conversation = conversation
+        self.top_k = top_k
 
     @abstractmethod
     def execute(self, is_chat=False):
@@ -60,3 +62,8 @@ class ChatProvider(Provider):
     @abstractmethod
     def format_chat_history(self, history: list) -> list:
         return []
+
+class EmbeddingsProvider(Provider):
+    
+    def embed_content(self):
+        pass

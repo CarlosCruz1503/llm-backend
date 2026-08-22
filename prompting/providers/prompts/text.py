@@ -1,7 +1,7 @@
 from enum import Enum
 
 from pydantic import BaseModel
-from prompting.utils.structured_outputs.prompt import (
+from prompting.schemas.prompt import (
     SummarizeOutputModel,
     classifyOutputModel,
     keyWordsOutputModel

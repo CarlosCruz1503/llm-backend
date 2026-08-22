@@ -5,6 +5,8 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "celery==5.3.6",
+    "chonkie>=1.7.0",
     "django>=6.0.7",
     "django-crum>=0.7.9",
     "django-rest-swagger>=2.2.0",
@@ -12,9 +14,17 @@ dependencies = [
     "djangorestframework-simplejwt>=5.5.1",
     "drf-spectacular>=0.30.0",
     "drf-spectacular-sidecar>=2026.7.1",
+    "fastembed>=0.8.0",
+    "flower==2.0.1",
     "google-genai>=2.14.0",
     "gunicorn>=26.0.0",
     "openrouter>=1.1.12",
+    "pdfplumber>=0.11.10",
+    "pgvector>=0.5.0",
     "psycopg[binary]>=3.3.4",
     "pydantic>=2.12.5",
+    "redis==5.0.1",
+    "tiktoken>=0.13.0",
+    "tokenizers>=0.20.0",
+    "transformers>=4.45.0",
 ]

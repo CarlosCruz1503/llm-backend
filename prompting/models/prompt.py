@@ -1,6 +1,6 @@
 from django.db import models
 
-from myapp.base import BaseModel
+from myapp.base import UserModel
 from prompting.constants import DEFAULT_THINKING_LEVEL, ProviderChoices, ThinkingLevelChoices
 
 
@@ -10,7 +10,7 @@ class OutputType(models.TextChoices):
     EXTRACT_KEYWORDS = "extract_keywords", "Extract keywords"
 
 
-class PromptModel(BaseModel):
+class PromptModel(UserModel):
 
     input = models.TextField(max_length=2000, null=False, blank=False)
     output_type = models.CharField(choices=OutputType.choices)

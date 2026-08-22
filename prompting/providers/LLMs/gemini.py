@@ -6,47 +6,60 @@ from django.core.exceptions import ImproperlyConfigured
 from google import genai
 from google.genai import types
 
-from ...constants import MODEL_GEMINI, SYSTEM_INSTRUCTION_FOR_CHAT
-from ..base import ChatProvider
+from ...constants import DEFAULT_EMBEDDING_DIMENTIONS, GEMINI_EMBEDDING_MODEL, GEMINI_MODEL, SYSTEM_INSTRUCTION_FOR_CHAT
+from ..base import ChatProvider, EmbeddingsProvider
 
 logger = logging.getLogger(__name__)
 
 
-class GeminiProvider(ChatProvider):
+class GeminiProvider(ChatProvider, EmbeddingsProvider):
 
-    model: str = MODEL_GEMINI
+    model: str = GEMINI_MODEL
+    embedding_model = GEMINI_EMBEDDING_MODEL
     client: Any
 
-    def __init__(self, thinking_level, input, output_type, conversation=None):
-        super().__init__(thinking_level, input, output_type, conversation)
+    def __init__(self, input, thinking_level="", output_type="", conversation=None, top_k=None):
+        super().__init__(input,thinking_level, output_type, conversation,top_k)
         if not self.model:
             raise ImproperlyConfigured(
                 "GEMINI_AI_MODEL environment variable is not set; the Gemini provider cannot run."
             )
         self.client = genai.Client()
 
-    def build_message(self, is_chat):
+    def build_message(self, is_chat, is_search):
         message = [types.Content(
             role='user',
             parts=[types.Part(text=f"{self.input}")]
         )]
-        if not is_chat:
+        if not is_chat and not is_search:
             message.append(types.Content(
                 role='user',
                 parts=[types.Part(text=f"{self.output_type.prompt}")]
             ))
         return message
+    
+    def build_search_content(self):
+        
+        return types.Content(
+                role='user',
+                parts=[types.Part(text=f'Answer the question or search {self.input} based on this top_k rag chunks {json.dumps(self.top_k, indent=2)}')]
+            )
+        
 
-    def build_context(self, is_chat):
-        message = self.build_message(is_chat)
+    def build_context(self, is_chat, is_search):
+        message = self.build_message(is_chat, is_search)
 
-        if not is_chat:
-            return message
 
-        history = self.retrieve_chat_history(self.conversation)
-        return [*history, *message]
-
-    def execute(self, is_chat=False):
+        if is_chat:
+            history = self.retrieve_chat_history(self.conversation)
+            return [*history, *message]
+        
+        if is_search:
+            search = self.build_search_content()
+            return search
+        
+        return message
+    def execute(self, is_chat=False, is_search=False):
         try:
             config = {
                 'response_mime_type': 'application/json',
@@ -57,11 +70,13 @@ class GeminiProvider(ChatProvider):
                 # rather than as another message in `contents`.
                 config['system_instruction'] = SYSTEM_INSTRUCTION_FOR_CHAT
 
+                
             response = self.client.models.generate_content(
                 model=self.model,
-                contents=self.build_context(is_chat),
+                contents=self.build_context(is_chat, is_search),
                 config=config,
             )
+
             return self.transform_response(response)
         except Exception:
             logger.exception("Gemini provider execution failed")
@@ -95,3 +110,15 @@ class GeminiProvider(ChatProvider):
             )
             for message in history
         ]
+
+    def embed_content(self):
+        try: 
+            embedding_response = self.client.models.embed_content(
+                model=self.embedding_model,
+                contents=self.input,
+                config=types.EmbedContentConfig(output_dimensionality=DEFAULT_EMBEDDING_DIMENTIONS)
+            )
+            return embedding_response.embeddings[0].values
+        except Exception:
+            logger.exception("Failed to generate Gemini embedding")
+            raise

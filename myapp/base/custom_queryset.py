@@ -2,7 +2,7 @@ from crum import get_current_user
 from django.db import models
 
 
-class ObjectsManager(models.Manager):
+class ObjectsUserManager(models.Manager):
     """General object's manager to filter deleted rows and scope by owner."""
 
     def get_queryset(self):

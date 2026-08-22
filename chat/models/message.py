@@ -1,6 +1,6 @@
 from django.db import models
 
-from myapp.base import BaseModel
+from myapp.base import UserModel
 from prompting.constants import DEFAULT_THINKING_LEVEL, ProviderChoices, ThinkingLevelChoices
 
 from .conversation import Conversation
@@ -12,7 +12,7 @@ class RoleChoices(models.TextChoices):
     SYSTEM = "system", "System"
 
 
-class Message(BaseModel):
+class Message(UserModel):
     """
     Message model.
     """

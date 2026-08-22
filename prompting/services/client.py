@@ -2,7 +2,8 @@ import logging
 from types import SimpleNamespace
 
 from chat.models.message import Message
-from prompting.utils.structured_outputs.chat.message import messageOutputModel
+from prompting.schemas.message import messageOutputModel
+from rag.schemas.search import ResultSearchSchema, SearchSchema
 
 from ..factory.output import promptsFactory
 from ..factory.provider import factoryProvider
@@ -34,6 +35,32 @@ def create_client_for_message(validated_data, conversation):
             input=validated_data["content"],
             output_type=output_type_object,
             conversation=conversation,
+        )
+    except Exception:
+        logger.exception("Failed to build the provider client for a chat message")
+        raise
+    
+def create_client_for_embedding(provider, content):
+    try:
+        client = factoryProvider(provider)
+
+        return client(
+            input=content,
+        )
+    except Exception:
+        logger.exception("Failed to build the provider client for a chat message")
+        raise
+    
+def create_client_for_search(provider, content, top_k):
+    try:
+        client = factoryProvider(provider)
+
+        output_type_object = SimpleNamespace(structured_output=ResultSearchSchema)
+        
+        return client(
+            input=content,
+            output_type=output_type_object,
+            top_k=top_k
         )
     except Exception:
         logger.exception("Failed to build the provider client for a chat message")
@@ -79,6 +106,24 @@ def save_client_reponse_for_message(sent_message, response):
         received_message = Message.objects.create(**data)
         sent_message.save()
         return received_message
+    except Exception:
+        logger.exception("Failed to save the assistant's reply message")
+        raise
+    
+def save_client_reponse_for_search(search, response):
+    try:
+        search.input_tokens = response["input_tokens"]
+        search.output_tokens = response["output_tokens"]
+        search.total_tokens = response["total_tokens"]
+        search.status = response["status"]
+        search.response_code = response["response_code"]
+        search.request_id = response["id"]
+        search.top_chunk_id = response["output_dict"]["chunk_id"]
+        search.distance_top_chunk = response["output_dict"]["distance_top_chunk"]
+        search.response = response["output"]
+        search.chunk_list = response["output_dict"]["chunk_list"]
+        search.save()
+        return search
     except Exception:
         logger.exception("Failed to save the assistant's reply message")
         raise

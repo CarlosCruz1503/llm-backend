@@ -2,18 +2,22 @@ from django.db import models
 from django.contrib.auth.models import User
 from crum import get_current_user
 
-from myapp.base.custom_queryset import ObjectsManager
-        
+from myapp.base.custom_queryset import ObjectsUserManager
+
 class BaseModel(models.Model):
-    """
-    Base model.
-    """
-    user = models.ForeignKey(User, on_delete=models.RESTRICT, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted = models.BooleanField(default=False)
 
-    objects = ObjectsManager()
+    class Meta:
+        abstract = True
+class UserModel(BaseModel):
+    """
+    User model.
+    """
+    user = models.ForeignKey(User, on_delete=models.RESTRICT, null=False, blank=False)
+
+    objects = ObjectsUserManager()
 
     def save(self, *args, **kwargs):
         # Only set on creation (when the object doesn't have a pk yet).

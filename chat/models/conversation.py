@@ -1,6 +1,6 @@
 from django.db import models
-from myapp.base import BaseModel
-class Conversation(BaseModel):
+from myapp.base import UserModel
+class Conversation(UserModel):
     """
     Conversation model.
     """
