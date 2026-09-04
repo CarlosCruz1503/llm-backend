@@ -1,8 +1,12 @@
+import logging
+
 from django.db import models
 from django.contrib.auth.models import User
 from crum import get_current_user
 
 from myapp.base.custom_queryset import ObjectsUserManager
+
+logger = logging.getLogger(__name__)
 
 class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -27,7 +31,13 @@ class UserModel(BaseModel):
             user = get_current_user()
             if user and user.is_authenticated:
                 self.user = user
-
+            if not user:
+                # No request-bound user (e.g. a management command, a Celery
+                # task, or a test) — fall back to a superuser so the
+                # not-null `user` FK is still satisfied. Documented gap, not
+                # correct for a real multi-tenant production setup: see
+                # "Known limitations / roadmap" in the README.
+                self.user = User.objects.filter(is_superuser=True).first()
         super().save(*args, **kwargs)
         
     class Meta:

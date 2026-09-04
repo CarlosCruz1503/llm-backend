@@ -1,6 +1,5 @@
 from myapp.serializers.base import BaseSerializer
 from rag.models.document import DocumentModel
-from rag.services.document import DocumentService
 from rag.tasks import task_process_document
 
 
@@ -26,5 +25,16 @@ class DocumentSerializer(BaseSerializer):
         # ModelSerializer.create().
         self.extract_metadata(validated_data)
         document = DocumentModel.objects.create(**validated_data)
-        task_process_document.delay(document.id)
+
+        # Optional chunking overrides (used by the RAG evaluation experiments
+        # to run different chunk_size/chunk_overlap/token_model configurations).
+        # Regular API callers never set this context, so normal requests keep
+        # using the env-backed defaults untouched.
+        chunk_config = self.context.get("chunk_config") or {}
+        task_process_document.delay(
+            document.id,
+            chunk_model=chunk_config.get("model"),
+            chunk_size=chunk_config.get("chunk_size"),
+            chunk_overlap=chunk_config.get("chunk_overlap"),
+        )
         return document

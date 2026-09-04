@@ -17,6 +17,11 @@ wheels/
 staticfiles/
 media/
 
+# Celery beat runtime state (local scheduler db, not source)
+celerybeat-schedule
+celerybeat-schedule-shm
+celerybeat-schedule-wal
+
 # Editors / OS
 .vscode/
 .idea/

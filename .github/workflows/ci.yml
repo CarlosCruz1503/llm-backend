@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # Same image docker-compose.yaml uses for `db`, so the pgvector
+    # extension/HNSW index in rag's migrations behave the same as they do
+    # in dev — a plain `postgres` image would fail those migrations.
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_DB: myapp
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      SECRET_KEY: ci-test-secret-key
+      DEBUG: "0"
+      ALLOWED_HOSTS: localhost,127.0.0.1
+      POSTGRES_DB: myapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: "5432"
+      # No real provider calls happen in the test suite (see prompting/tests.py
+      # — only the provider *classes*/schemas are exercised), so these can be
+      # anything non-empty.
+      GEMINI_AI_MODEL: gemini-2.5-flash
+      GEMINI_EMBEDDING_MODEL: gemini-embedding-001
+      OPENROUTER_MODEL: placeholder
+      OPENROUTER_EMBEDDING_MODEL: placeholder
+      # Read at model-definition time (rag/models/document_chunk.py's
+      # VectorField), with no fallback — every management command
+      # (including `test`) fails at import time without it.
+      DEFAULT_EMBEDDING_DIMENTIONS: "1024"
+      COSINE_DISTANCE_THRESHOLD: "0.45"
+      CELERY_BROKER: redis://localhost:6379/0
+      CELERY_BACKEND: redis://localhost:6379/0
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.13
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Lint (ruff)
+        run: uv run ruff check .
+
+      - name: Run migrations
+        run: uv run python manage.py migrate --noinput
+
+      - name: Run tests
+        run: uv run python manage.py test

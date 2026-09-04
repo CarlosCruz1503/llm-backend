@@ -1,0 +1,27 @@
+{
+    "evaluation_config": {
+        "max_tokens_for_chunk": 100,
+        "default_overlap_tokens_for_chunk": 20,
+        "default_top_k_retrieve_size": 5,
+        "cosine_distance_threshold": 1.0,
+        "reranker_enable": false,
+        "provider": "gemini"
+    },
+    "total_questions": 1,
+    "results": [
+        {
+            "id": 1,
+            "category": "menu",
+            "query": "What vegetarian dishes are available?",
+            "expected_topics": [
+                "vegetarian dishes"
+            ],
+            "expected_documents": [
+                "restaurant_menu.pdf"
+            ],
+            "fetched_document": "restaurant_menu.pdf",
+            "generated_response": "The available vegetarian dishes at The Garden Table are the mushroom pasta, vegetable curry, garden salad, and roasted tomato soup.",
+            "is_match": true
+        }
+    ]
+}

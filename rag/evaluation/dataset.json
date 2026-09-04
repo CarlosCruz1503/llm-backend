@@ -1,0 +1,217 @@
+[
+    {
+      "id": 1,
+      "category": "menu",
+      "query": "What vegetarian dishes are available?",
+      "difficulty": "easy",
+      "expected_topics": ["vegetarian dishes"],
+      "expected_answer": "The vegetarian dishes are mushroom pasta, vegetable curry, garden salad, and roasted tomato soup.",
+      "relevant_documents": ["restaurant_menu.pdf"],
+      "should_answer": true
+    },
+    {
+      "id": 2,
+      "category": "menu",
+      "query": "What are the main ingredients in the grilled chicken dish?",
+      "difficulty": "easy",
+      "expected_topics": ["grilled chicken", "ingredients"],
+      "expected_answer": "The grilled chicken bowl contains grilled chicken, roasted vegetables, rice, and herb sauce.",
+      "relevant_documents": ["restaurant_menu.pdf"],
+      "should_answer": true
+    },
+    {
+      "id": 3,
+      "category": "menu",
+      "query": "Which dishes contain seafood?",
+      "difficulty": "easy",
+      "expected_topics": ["seafood dishes"],
+      "expected_answer": "The seafood dishes include crispy calamari and grilled salmon.",
+      "relevant_documents": ["restaurant_menu.pdf", "allergen_guide.pdf"],
+      "should_answer": true
+    },
+    {
+      "id": 5,
+      "category": "menu",
+      "query": "What is the most expensive main course?",
+      "difficulty": "medium",
+      "expected_topics": ["main courses", "prices"],
+      "expected_answer": "The grilled salmon is the most expensive main course at $21.",
+      "relevant_documents": ["restaurant_menu.pdf"],
+      "should_answer": true
+    },
+    {
+      "id": 6,
+      "category": "menu",
+      "query": "Which dishes are suitable for someone who does not eat meat?",
+      "difficulty": "medium",
+      "expected_topics": ["vegetarian dishes", "meat-free options"],
+      "expected_answer": "Suitable meat-free options include mushroom pasta, vegetable curry, garden salad, and roasted tomato soup.",
+      "relevant_documents": ["restaurant_menu.pdf"],
+      "should_answer": true
+    },
+    {
+      "id": 8,
+      "category": "menu",
+      "query": "Which dishes contain dairy products?",
+      "difficulty": "medium",
+      "expected_topics": ["dairy", "allergens"],
+      "expected_answer": "The mushroom pasta contains dairy in its standard preparation. Some dishes may be prepared without dairy upon request.",
+      "relevant_documents": ["allergen_guide.pdf", "restaurant_menu.pdf"],
+      "should_answer": true
+    },
+    {
+      "id": 10,
+      "category": "menu",
+      "query": "Can you recommend something light for lunch?",
+      "difficulty": "hard",
+      "expected_topics": ["light meals", "lunch"],
+      "expected_answer": "The garden salad or roasted tomato soup would be reasonable lighter options for lunch.",
+      "relevant_documents": ["restaurant_menu.pdf"],
+      "should_answer": true
+    },
+  
+    {
+      "id": 11,
+      "category": "hours",
+      "query": "What time does the restaurant open?",
+      "difficulty": "easy",
+      "expected_topics": ["opening hours"],
+      "expected_answer": "The restaurant opens at 11:30 AM from Tuesday through Sunday.",
+      "relevant_documents": ["restaurant_policies.pdf"],
+      "should_answer": true
+    },
+    {
+      "id": 12,
+      "category": "hours",
+      "query": "What time does the restaurant close on weekends?",
+      "difficulty": "easy",
+      "expected_topics": ["weekend hours", "closing time"],
+      "expected_answer": "The restaurant closes at 10:30 PM on Friday and Saturday, and at 8:00 PM on Sunday.",
+      "relevant_documents": ["restaurant_policies.pdf"],
+      "should_answer": true
+    },
+
+    {
+      "id": 16,
+      "category": "reservations",
+      "query": "Can I make a reservation for a large group?",
+      "difficulty": "medium",
+      "expected_topics": ["large groups", "reservations"],
+      "expected_answer": "Yes. Groups of eight or more can make reservations and should do so at least 24 hours in advance.",
+      "relevant_documents": ["restaurant_policies.pdf"],
+      "should_answer": true
+    },
+    {
+      "id": 18,
+      "category": "reservations",
+      "query": "Can I modify an existing reservation?",
+      "difficulty": "medium",
+      "expected_topics": ["reservation modification", "reservations"],
+      "expected_answer": "The available restaurant policies do not specify a formal reservation modification policy. Guests should contact the restaurant to request a change.",
+      "relevant_documents": ["restaurant_policies.pdf"],
+      "should_answer": true
+    },
+  
+    {
+      "id": 20,
+      "category": "policies",
+      "query": "Does the restaurant have a dress code?",
+      "difficulty": "easy",
+      "expected_topics": ["dress code"],
+      "expected_answer": "The restaurant's dress code is not specified in the current knowledge base.",
+      "relevant_documents": [],
+      "should_answer": false
+    },
+    {
+      "id": 21,
+      "category": "policies",
+      "query": "Can I bring my own cake?",
+      "difficulty": "medium",
+      "expected_topics": ["outside food", "cake", "restaurant policy"],
+      "expected_answer": "The current knowledge base does not specify whether guests may bring their own cake.",
+      "relevant_documents": [],
+      "should_answer": false
+    },
+    {
+      "id": 22,
+      "category": "policies",
+      "query": "Does the restaurant offer outdoor seating?",
+      "difficulty": "easy",
+      "expected_topics": ["outdoor seating"],
+      "expected_answer": "Yes. The restaurant has an outdoor patio where dogs are welcome.",
+      "relevant_documents": ["restaurant_policies.pdf"],
+      "should_answer": true
+    },
+  
+    {
+      "id": 23,
+      "category": "payments",
+      "query": "What payment methods are accepted?",
+      "difficulty": "easy",
+      "expected_topics": ["payment methods"],
+      "expected_answer": "For online orders, the restaurant accepts Visa, Mastercard, American Express, and supported digital wallets. Pickup orders can also be paid with cash.",
+      "relevant_documents": ["delivery_and_orders.pdf"],
+      "should_answer": true
+    },
+  
+    {
+      "id": 25,
+      "category": "location",
+      "query": "Where is the restaurant located?",
+      "difficulty": "easy",
+      "expected_topics": ["address", "location"],
+      "expected_answer": "The restaurant's address is not specified in the current knowledge base.",
+      "relevant_documents": [],
+      "should_answer": false
+    },
+    {
+      "id": 26,
+      "category": "location",
+      "query": "Is parking available for customers?",
+      "difficulty": "easy",
+      "expected_topics": ["parking", "location"],
+      "expected_answer": "The current knowledge base does not specify whether customer parking is available.",
+      "relevant_documents": [],
+      "should_answer": false
+    },
+
+    {
+      "id": 28,
+      "category": "events",
+      "query": "What services are available for private events?",
+      "difficulty": "hard",
+      "expected_topics": ["private events", "event services"],
+      "expected_answer": "Private events can use a fixed three-course menu with vegetarian alternatives. The private room has Wi-Fi and a presentation screen, and the restaurant can arrange coffee, tea, and non-alcoholic beverages.",
+      "relevant_documents": ["events_private_dining.pdf"],
+      "should_answer": true
+    },
+  
+    {
+      "id": 29,
+      "category": "sustainability",
+      "query": "What sustainability practices does the restaurant follow?",
+      "difficulty": "hard",
+      "expected_topics": ["sustainability", "environmental practices"],
+      "expected_answer": "The current knowledge base does not contain enough information about the restaurant's sustainability practices.",
+      "relevant_documents": [],
+      "should_answer": false
+    },
+  
+    {
+      "id": 30,
+      "category": "multi-hop",
+      "query": "Can I bring my dog, sit outside, and order a vegetarian meal?",
+      "difficulty": "hard",
+      "expected_topics": [
+        "pets",
+        "outdoor seating",
+        "vegetarian dishes"
+      ],
+      "expected_answer": "Yes. Dogs are welcome on the outdoor patio, and vegetarian options include mushroom pasta, vegetable curry, garden salad, and roasted tomato soup. Guests should request a patio table when making the reservation.",
+      "relevant_documents": [
+        "restaurant_policies.pdf",
+        "restaurant_menu.pdf"
+      ],
+      "should_answer": true
+    }
+  ]

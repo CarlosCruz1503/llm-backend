@@ -37,15 +37,20 @@ services:
     #     - action: rebuild
     #       path: uv.lock
   db:
-    image: pgvector/pgvector:pg16 
+    image: pgvector/pgvector:pg16
     restart: always
     volumes:
       # Persist database data across container restarts.
       - db-data:/var/lib/postgresql
+    # Read from the same .env file everything else uses (compose
+    # auto-substitutes ${VAR} below from it), so changing POSTGRES_* in
+    # .env actually changes the database's own credentials too — previously
+    # these were hardcoded here and silently ignored .env.
+    env_file: .env
     environment:
-      - POSTGRES_DB=myapp
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     # Expose the port only to other services on the Compose network,
     # not to the host machine.
     expose:

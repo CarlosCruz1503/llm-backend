@@ -53,8 +53,13 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    # Every viewset below already sets IsAuthenticated explicitly; this is
+    # the fallback for anything that doesn't. Token issuance/refresh
+    # (rest_framework_simplejwt) and the docs/schema views (drf-spectacular)
+    # each declare their own permission_classes and are unaffected by this
+    # default, so it's safe to default-closed rather than default-open.
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     # Without pagination, list endpoints (e.g. GET /api/message/) return every

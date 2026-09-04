@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from typing import Dict
 
 from django.core.exceptions import ImproperlyConfigured
@@ -52,7 +53,7 @@ class OpenRouterProvider(ChatProvider):
         
 
 
-    def execute(self, is_chat=False, is_search=False):
+    def execute(self, is_chat=False, is_search=False, retry=0):
         try:
             response_format = {
                 "type": "json_schema",
@@ -69,7 +70,26 @@ class OpenRouterProvider(ChatProvider):
                 )
             return self.transform_response(response)
         except Exception:
-            logger.exception("OpenRouter provider execution failed")
+            max_retries = 3
+            if retry < max_retries:
+                logger.warning(
+                    "OpenRouter provider execution failed (attempt %s/%s), retrying...",
+                    retry + 1, max_retries + 1, exc_info=True,
+                )
+                # Backoff before retrying: on a free-tier quota/saturation
+                # error, hitting the API again immediately just fails the
+                # same way. Capped (rather than 10**retry, which reaches 100s
+                # on the 3rd attempt) since this sleep blocks the caller's
+                # thread directly — including, for prompt/chat/search, the
+                # synchronous HTTP request itself.
+                time.sleep(min(2 ** retry, 8))
+                return self.execute(is_chat, is_search, retry=retry + 1)
+
+            # Retries exhausted: log and re-raise so the caller (e.g.
+            # SearchService/ChatService) sees a real exception instead of a
+            # silently swallowed None — which would otherwise surface later
+            # as a confusing, unrelated-looking failure further downstream.
+            logger.exception("OpenRouter provider execution failed after %s attempts", max_retries + 1)
             raise
 
     def transform_response(self, response) -> Dict:

@@ -1,5 +1,4 @@
 import logging
-from abc import ABC
 
 from chat.models.conversation import Conversation
 from chat.models.message import Message
@@ -8,7 +7,7 @@ from prompting.services.client import create_client_for_message, save_client_rep
 logger = logging.getLogger(__name__)
 
 
-class ConversationService(ABC):
+class ConversationService:
 
     def execute(self, validated_data):
         try:

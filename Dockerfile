@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Build stage: the -dev image includes tools needed to install packages.
-FROM python:3.10-bullseye AS builder
+FROM python:3.13-slim-bookworm AS builder
 
 # Prevent Python from writing .pyc files to disk.
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -59,9 +59,12 @@ ENTRYPOINT ["/entrypoint"]
 # /start-celerybeat, /start-flower).
 CMD ["/start"]
 
-# The production stage uses the minimal runtime image, which has no shell,
-# no package manager, and already runs as the nonroot user.
-FROM python:3.10-bullseye AS production
+# The production stage starts from the same slim base as the builder, but
+# copies in only the built virtualenv and the app source — no build tools,
+# no uv. Note this is still a full Debian image (has a shell, apt, and runs
+# as root by default); see "Known limitations / roadmap" in the README for
+# what's still missing before this stage is actually deploy-ready.
+FROM python:3.13-slim-bookworm AS production
 
 # Prevent Python from buffering stdout/stderr so logs appear immediately.
 ENV PYTHONUNBUFFERED=1

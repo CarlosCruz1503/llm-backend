@@ -19,17 +19,25 @@ def add(x, y):
 @shared_task(bind=True,
              max_retries=3,
              retry_backoff=4)
-def task_process_document(self, document_id: int) -> int:
+def task_process_document(self, document_id: int, chunk_model=None, chunk_size=None, chunk_overlap=None) -> int:
     # Returns the document's id rather than the DocumentModel instance
     # itself: Celery stores every task's return value in the result backend
     # via JSON, and a Django model instance isn't JSON-serializable (it
     # fails with kombu.exceptions.EncodeError once the task tries to report
     # itself done).
+    #
+    # chunk_model/chunk_size/chunk_overlap are optional overrides (used by
+    # the RAG evaluation experiments) forwarded to task_create_and_process_chunks.
+    # They travel as serialized task args through the broker, so — unlike
+    # mutating a module/class attribute in the caller's process — they
+    # actually reach whichever process runs the celery worker.
     try:
         document_service = DocumentService()
         document = document_service.process_document(document_id)
         if document.text_extracted:
-            task_create_and_process_chunks.delay(document.id)
+            task_create_and_process_chunks.delay(
+                document.id, chunk_model=chunk_model, chunk_size=chunk_size, chunk_overlap=chunk_overlap
+            )
         return document.id
     except Exception as exc:
         if self.request.retries >= self.max_retries:
@@ -46,10 +54,10 @@ def task_process_document(self, document_id: int) -> int:
 @shared_task(bind=True,
              max_retries=3,
              retry_backoff=4)
-def task_create_and_process_chunks(self, document_id: int) -> None:
+def task_create_and_process_chunks(self, document_id: int, chunk_model=None, chunk_size=None, chunk_overlap=None) -> None:
     chunk_service = ChunkService()
     try:
-        chunks = chunk_service.process_chunks(document_id)
+        chunks = chunk_service.process_chunks(document_id, model=chunk_model, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
         # `chord` fires task_finalize_document once every task_process_chunk
         # in the group has finished, whether they succeeded or not — that's
         # the only reliable signal that embedding generation is actually
@@ -83,12 +91,20 @@ def task_process_chunk(self, chunk_id: int, document_id: int) -> bool:
         return True
     except Exception as exc:
         if self.request.retries >= self.max_retries:
+            # `chunk` may not be bound if DocumentChunkModel.objects.get()
+            # itself is what raised (e.g. the row was deleted, or a DB
+            # hiccup) — re-fetch by id rather than assuming it exists, so
+            # this final-failure path can't itself crash with an
+            # UnboundLocalError and mask the real error.
             document = DocumentModel.objects.get(pk=document_id)
-            chunk.error_embedding = f"Error: {exc}"
             document.error = f"Error: {exc}"
-            logger.error(f"Chunk {chunk.id} failed permanently to be processed after max retries {exc}")
-            chunk.save(update_fields=["error_embedding"])
+            logger.error(f"Chunk {chunk_id} failed permanently to be processed after max retries {exc}")
             document.save(update_fields=["error"])
+
+            chunk = DocumentChunkModel.objects.filter(pk=chunk_id).first()
+            if chunk is not None:
+                chunk.error_embedding = f"Error: {exc}"
+                chunk.save(update_fields=["error_embedding"])
             return False
 
         # Re-raise the retry

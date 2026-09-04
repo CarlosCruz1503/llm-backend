@@ -1,7 +1,7 @@
 [project]
 name = "django-docker"
 version = "0.1.0"
-description = "Add your description here"
+description = "Django REST API: provider-agnostic LLM abstraction, async RAG ingestion, and token-budgeted chat"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -9,7 +9,6 @@ dependencies = [
     "chonkie>=1.7.0",
     "django>=6.0.7",
     "django-crum>=0.7.9",
-    "django-rest-swagger>=2.2.0",
     "djangorestframework>=3.17.1",
     "djangorestframework-simplejwt>=5.5.1",
     "drf-spectacular>=0.30.0",
@@ -28,3 +27,24 @@ dependencies = [
     "tokenizers>=0.20.0",
     "transformers>=4.45.0",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.16.6",
+]
+
+[tool.ruff]
+target-version = "py313"
+extend-exclude = ["migrations"]
+
+[tool.ruff.lint]
+# Scoped to real mistakes (undefined names, unused imports, syntax errors)
+# rather than style/formatting — this is a lint gate, not a reformatting
+# pass over code that was never written to one style guide.
+select = ["E9", "F"]
+
+[tool.ruff.lint.per-file-ignores]
+# Every app's __init__.py re-exports its submodules on purpose (`from
+# chat.models import Conversation` instead of `chat.models.conversation`) —
+# that's the intended shape, not a mistake.
+"**/__init__.py" = ["F401"]

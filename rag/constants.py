@@ -1,3 +1,4 @@
+import os
 from django.db import models
 
 
@@ -17,3 +18,5 @@ class DocumentStatusChoices(models.TextChoices):
 
 
 DEFAULT_DOCUMENT_STATUS = DocumentStatusChoices.PENDING
+
+RERANKER_ENABLED = (os.environ.get("RERANKER_ENABLED")  == "True")

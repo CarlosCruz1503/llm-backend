@@ -1,5 +1,7 @@
 # LLM Platform API
 
+[![CI](https://github.com/CarlosCruz1503/llm-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/CarlosCruz1503/llm-backend/actions/workflows/ci.yml)
+
 A Django REST backend that ties together three things you'd normally see split across separate side projects: a **provider-agnostic LLM abstraction** (swap Gemini/OpenRouter without touching call sites), an **async-first RAG ingestion pipeline** (PDF → chunks → embeddings, orchestrated with Celery), and a **token-budgeted chat system**. It's API-only by design — a REST surface meant to be driven by any client (curl, a frontend, another service), not a bundled UI.
 
 This README leads with *why* things are built the way they are, since that's usually more interesting than *what* the endpoints are.
@@ -10,12 +12,14 @@ This README leads with *why* things are built the way they are, since that's usu
 - [Design decisions worth reading](#design-decisions-worth-reading)
 - [The RAG pipeline](#the-rag-pipeline)
 - [The search pipeline](#the-search-pipeline-synchronous-by-design)
+- [Evaluating RAG configurations](#evaluating-rag-configurations)
 - [Provider abstraction](#provider-abstraction)
 - [Tech stack](#tech-stack)
 - [Project structure](#project-structure)
 - [API reference](#api-reference)
 - [Getting started](#getting-started)
 - [Environment variables](#environment-variables)
+- [Testing & CI](#testing--ci)
 - [Adding a new LLM provider](#adding-a-new-llm-provider)
 - [Known limitations / roadmap](#known-limitations--roadmap)
 
@@ -143,6 +147,16 @@ sequenceDiagram
 
 No polling, no task id to check later — the tradeoff is that a slow provider call or a cold reranker load is felt directly in request latency, which is why the reranker singleton (above) matters.
 
+## Evaluating RAG configurations
+
+Wiring up chunking/retrieval/reranking is the easy part; knowing whether a given chunk size, top-k, distance threshold, or reranker setting actually retrieves the right document is a separate, empirical question. `rag/evaluation/` (`EvaluationService`, `rag/services/evaluation.py`) is a small experiment harness built to answer that for this project specifically:
+
+- A fictional restaurant's knowledge base (menu, hours/policies, dietary info, etc. — nine PDFs, `rag/evaluation/data/testset_files/`) is embedded through the normal async ingestion pipeline, with the experiment's chunk size/overlap/token model passed explicitly as task args (not global state), so multiple experiments can't leak config into each other.
+- A fixed set of questions (`rag/evaluation/dataset.json`) is run against each configuration, scoring both **retrieval recall** (was the right document among the top-k retrieved, regardless of which chunk the LLM cited) and **answer correctness** (a manual grading pass on top of the automatic per-question match check — matching the right source document doesn't guarantee the generated answer is actually good).
+- Three configurations (`rag/evaluation/scripts/experiment_{A,B,C}.py`) — small/no-rerank, medium/no-rerank, medium/reranked — are compared side by side in `rag/evaluation/results/`.
+
+See `rag/evaluation/README.md` for the full write-up and how to reproduce a run.
+
 ## Provider abstraction
 
 ```mermaid
@@ -240,7 +254,7 @@ Then:
 - Admin: `http://localhost:8000/admin/`
 - Flower (task monitoring): `http://localhost:5557/`
 
-See `makefile` for the rest of the targets (`logs`, `bash`, `migrations`, `restart`, `rebuild-web`).
+See `makefile` for the rest of the targets (`logs`, `bash`, `migrations`, `restart`, `rebuild-web`, `test`, `lint`).
 
 ## Environment variables
 
@@ -258,6 +272,18 @@ See `makefile` for the rest of the targets (`logs`, `bash`, `migrations`, `resta
 | `CELERY_BROKER`, `CELERY_BACKEND` | Redis URLs for the Celery broker/result backend |
 | `CELERY_TIMEZONE`, `CELERY_TASK_TRACK_STARTED`, `CELERY_TASK_TIME_LIMIT` | Celery runtime config |
 
+## Testing & CI
+
+`make test` (or `docker exec -it core_prompt python manage.py test`) runs the suite; GitHub Actions (`.github/workflows/ci.yml`) runs `ruff check` and the same suite against a real `pgvector/pgvector` Postgres on every push/PR — the badge at the top of this README reflects that run, not a manually-updated claim.
+
+Coverage is deliberately targeted rather than exhaustive — the parts of the codebase where a bug wouldn't be obvious from just reading the code:
+
+- The chat token-budget windowing (`chat/services/history.py`) — the running-sum-per-message logic behind "how much history fits the model's context".
+- The chord finalize callback (`rag/tasks.py::task_finalize_document`) — the only place a document's terminal `COMPLETED`/`FAILED` status actually gets set.
+- The chunk-embedding task's final-retry failure path — a regression test for a real bug this review caught (see git history): it used to reference a variable that was never bound when the failure came from the initial DB lookup itself, crashing with `UnboundLocalError` instead of recording the error.
+- The provider factory and prompt-schema factory (`factoryProvider`, `promptsFactory`) — the single point everything else routes through per provider/output type.
+- `Provider.validate_response` — the schema-validation gate every provider response has to pass before a serializer trusts it.
+
 ## Adding a new LLM provider
 
 1. Implement `Provider` (see `prompting/providers/base.py`) in `prompting/providers/LLMs/`.
@@ -270,5 +296,8 @@ Being upfront about the current gaps rather than hiding them:
 
 - **API-only.** No bundled frontend — it's meant to be driven by any client.
 - **The `production` Docker stage still defaults to Django's dev server**, not gunicorn (which is a declared dependency, with a ready-to-uncomment `CMD` line) — fine for local dev via `docker compose`, not yet meant for a real deploy.
-- **Single-user auth model.** JWT via `simplejwt` works, but there's no per-user rate limiting on LLM calls beyond the token-endpoint throttle.
+- **Single-user auth model.** JWT via `simplejwt` works, but there's no per-user rate limiting on LLM calls beyond the token-endpoint throttle. Ownership (`myapp/base/models.py::UserModel`) also falls back to "the first superuser" outside a request context (Celery tasks, management commands, tests) — fine for a single-operator project, not a real multi-tenant model.
 - **No streaming responses.** Chat and search both return the full LLM output in one response; token-by-token streaming (SSE/websockets) would be the natural next step for perceived latency.
+- **No tool calling or provider fallback.** Each request commits to one provider up front; there's no retry-on-a-different-provider if it's down, and no function/tool-calling support yet.
+- **No cost or usage analytics.** Token counts are recorded per-message/search (`input_tokens`/`output_tokens`/`total_tokens`), but nothing aggregates them into cost or usage dashboards.
+- **No structured observability.** Logging is console-only (see `LOGGING` in `myapp/settings.py`); no tracing/metrics export.

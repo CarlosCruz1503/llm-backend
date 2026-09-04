@@ -5,7 +5,6 @@ from myapp.base.models import UserModel
 from django.db import models
 from prompting.constants import DEFAULT_EMBEDDING_DIMENTIONS, ProviderChoices
 from rag.models.document_chunk import DocumentChunkModel
-from django.contrib.postgres.fields import ArrayField
 class SearchModel(UserModel):
     
     provider = models.CharField(choices=ProviderChoices.choices, default=ProviderChoices.GEMINI)

@@ -29,7 +29,16 @@ class SearchSerializer(BaseSerializer):
 
         try:
             search_service = SearchService()
-            return search_service.execute(search_instance)
+            # Optional retrieval overrides (used by the RAG evaluation
+            # experiments); absent for normal API callers, who keep the
+            # env-backed defaults.
+            search_config = self.context.get("search_config") or {}
+            return search_service.execute(
+                search_instance,
+                top_k=search_config.get("top_k"),
+                threshold=search_config.get("threshold"),
+                reranker_enabled=search_config.get("reranker_enabled"),
+            )
         except Exception:
             # SearchService already records the failure on `search_instance.error`
             # and saves it before re-raising, so the client still gets a valid

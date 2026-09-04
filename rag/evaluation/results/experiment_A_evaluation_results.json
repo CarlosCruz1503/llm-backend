@@ -1,0 +1,519 @@
+{
+    "evaluation_config": {
+        "provider": "gemini",
+        "default_token_model": "cl100k_base",
+        "max_tokens_for_chunk": 50,
+        "default_overlap_tokens_for_chunk": 10,
+        "default_top_k_retrieve_size": 3,
+        "cosine_distance_threshold": 2.0,
+        "reranker_enable": false
+    },
+    "total_questions": 20,
+    "results": [
+        {
+            "id": 1,
+            "category": "menu",
+            "query": "What vegetarian dishes are available?",
+            "expected_topics": [
+                "vegetarian dishes"
+            ],
+            "expected_documents": [
+                "restaurant_menu.pdf"
+            ],
+            "fetched_document": "restaurant_faq.pdf",
+            "distance_top_chunk": "0.2263275689122446",
+            "retrieved_documents": [
+                "restaurant_faq.pdf",
+                "restaurant_menu.pdf"
+            ],
+            "any_relevant_document_retrieved": true,
+            "generated_response": "The available vegetarian dishes are mushroom pasta, vegetable curry, garden salad, and roasted tomato soup.",
+            "is_match": false,
+            "input_tokens": 423,
+            "output_tokens": 808,
+            "total_tokens": 1231,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 2,
+            "category": "menu",
+            "query": "What are the main ingredients in the grilled chicken dish?",
+            "expected_topics": [
+                "grilled chicken",
+                "ingredients"
+            ],
+            "expected_documents": [
+                "restaurant_menu.pdf"
+            ],
+            "fetched_document": "restaurant_menu.pdf",
+            "distance_top_chunk": "0.35278717908702273",
+            "retrieved_documents": [
+                "restaurant_menu.pdf"
+            ],
+            "any_relevant_document_retrieved": true,
+            "generated_response": "The main ingredients in the grilled chicken dish (Grilled chicken bowl) are grilled chicken, roasted vegetables, rice, and herb sauce.",
+            "is_match": true,
+            "input_tokens": 433,
+            "output_tokens": 712,
+            "total_tokens": 1145,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 3,
+            "category": "menu",
+            "query": "Which dishes contain seafood?",
+            "expected_topics": [
+                "seafood dishes"
+            ],
+            "expected_documents": [
+                "restaurant_menu.pdf",
+                "allergen_guide.pdf"
+            ],
+            "fetched_document": "allergen_guide.pdf",
+            "distance_top_chunk": "0.28159788971096167",
+            "retrieved_documents": [
+                "allergen_guide.pdf"
+            ],
+            "any_relevant_document_retrieved": true,
+            "generated_response": "Based on the provided allergen guide, the dishes that contain seafood are Grilled Salmon (which contains fish) and Crispy Calamari (which contains shellfish).",
+            "is_match": true,
+            "input_tokens": 358,
+            "output_tokens": 801,
+            "total_tokens": 1159,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 5,
+            "category": "menu",
+            "query": "What is the most expensive main course?",
+            "expected_topics": [
+                "main courses",
+                "prices"
+            ],
+            "expected_documents": [
+                "restaurant_menu.pdf"
+            ],
+            "fetched_document": "restaurant_menu.pdf",
+            "distance_top_chunk": "0.32846935995989324",
+            "retrieved_documents": [
+                "restaurant_menu.pdf"
+            ],
+            "any_relevant_document_retrieved": true,
+            "generated_response": "Based on the provided menu, the most expensive main course is the Grilled salmon, which costs $21.",
+            "is_match": true,
+            "input_tokens": 394,
+            "output_tokens": 1120,
+            "total_tokens": 1514,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 6,
+            "category": "menu",
+            "query": "Which dishes are suitable for someone who does not eat meat?",
+            "expected_topics": [
+                "vegetarian dishes",
+                "meat-free options"
+            ],
+            "expected_documents": [
+                "restaurant_menu.pdf"
+            ],
+            "fetched_document": "restaurant_menu.pdf",
+            "distance_top_chunk": "0.24060690402975982",
+            "retrieved_documents": [
+                "restaurant_menu.pdf",
+                "restaurant_faq.pdf"
+            ],
+            "any_relevant_document_retrieved": true,
+            "generated_response": "Dishes suitable for someone who does not eat meat include mushroom pasta, vegetable curry, garden salad, and roasted tomato soup.",
+            "is_match": true,
+            "input_tokens": 429,
+            "output_tokens": 884,
+            "total_tokens": 1313,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 8,
+            "category": "menu",
+            "query": "Which dishes contain dairy products?",
+            "expected_topics": [
+                "dairy",
+                "allergens"
+            ],
+            "expected_documents": [
+                "allergen_guide.pdf",
+                "restaurant_menu.pdf"
+            ],
+            "fetched_document": "allergen_guide.pdf",
+            "distance_top_chunk": "0.2371736335039718",
+            "retrieved_documents": [
+                "allergen_guide.pdf",
+                "restaurant_menu.pdf"
+            ],
+            "any_relevant_document_retrieved": true,
+            "generated_response": "Based on the provided allergen guide, the mushroom pasta contains dairy in its standard preparation.",
+            "is_match": true,
+            "input_tokens": 415,
+            "output_tokens": 833,
+            "total_tokens": 1248,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 10,
+            "category": "menu",
+            "query": "Can you recommend something light for lunch?",
+            "expected_topics": [
+                "light meals",
+                "lunch"
+            ],
+            "expected_documents": [
+                "restaurant_menu.pdf"
+            ],
+            "fetched_document": "restaurant_menu.pdf",
+            "distance_top_chunk": "0.34710987737406873",
+            "retrieved_documents": [
+                "restaurant_menu.pdf",
+                "restaurant_faq.pdf"
+            ],
+            "any_relevant_document_retrieved": true,
+            "generated_response": "For a light lunch at The Garden Table, you could order the Roasted Tomato Soup ($7) or the Garden Salad.",
+            "is_match": true,
+            "input_tokens": 415,
+            "output_tokens": 797,
+            "total_tokens": 1212,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 11,
+            "category": "hours",
+            "query": "What time does the restaurant open?",
+            "expected_topics": [
+                "opening hours"
+            ],
+            "expected_documents": [
+                "restaurant_policies.pdf"
+            ],
+            "fetched_document": "restaurant_policies.pdf",
+            "distance_top_chunk": "0.25405185802490526",
+            "retrieved_documents": [
+                "restaurant_policies.pdf",
+                "restaurant_faq.pdf"
+            ],
+            "any_relevant_document_retrieved": true,
+            "generated_response": "The Garden Table opens at 11:30 AM Tuesday through Sunday. It is closed on Mondays.",
+            "is_match": true,
+            "input_tokens": 401,
+            "output_tokens": 920,
+            "total_tokens": 1321,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 12,
+            "category": "hours",
+            "query": "What time does the restaurant close on weekends?",
+            "expected_topics": [
+                "weekend hours",
+                "closing time"
+            ],
+            "expected_documents": [
+                "restaurant_policies.pdf"
+            ],
+            "fetched_document": "restaurant_policies.pdf",
+            "distance_top_chunk": "0.21581480314550117",
+            "retrieved_documents": [
+                "restaurant_policies.pdf",
+                "restaurant_faq.pdf"
+            ],
+            "any_relevant_document_retrieved": true,
+            "generated_response": "On weekends, the restaurant closes at 10:30 PM on Friday and Saturday, and at 8:00 PM on Sunday.",
+            "is_match": true,
+            "input_tokens": 415,
+            "output_tokens": 855,
+            "total_tokens": 1270,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 16,
+            "category": "reservations",
+            "query": "Can I make a reservation for a large group?",
+            "expected_topics": [
+                "large groups",
+                "reservations"
+            ],
+            "expected_documents": [
+                "restaurant_policies.pdf"
+            ],
+            "fetched_document": "restaurant_faq.pdf",
+            "distance_top_chunk": "0.15527065459134592",
+            "retrieved_documents": [
+                "restaurant_faq.pdf"
+            ],
+            "any_relevant_document_retrieved": false,
+            "generated_response": "Yes, you can make a reservation for a large group. Groups of eight or more should make a reservation at least 24 hours in advance.",
+            "is_match": false,
+            "input_tokens": 385,
+            "output_tokens": 769,
+            "total_tokens": 1154,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 18,
+            "category": "reservations",
+            "query": "Can I modify an existing reservation?",
+            "expected_topics": [
+                "reservation modification",
+                "reservations"
+            ],
+            "expected_documents": [
+                "restaurant_policies.pdf"
+            ],
+            "fetched_document": "restaurant_faq.pdf",
+            "distance_top_chunk": "0.2757559695926117",
+            "retrieved_documents": [
+                "restaurant_faq.pdf",
+                "restaurant_policies.pdf"
+            ],
+            "any_relevant_document_retrieved": true,
+            "generated_response": "Based on the provided documents, there is no specific information regarding whether you can modify an existing reservation. However, you can cancel your reservation without a fee up to two hours before the reservation time.",
+            "is_match": false,
+            "input_tokens": 381,
+            "output_tokens": 826,
+            "total_tokens": 1207,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 20,
+            "category": "policies",
+            "query": "Does the restaurant have a dress code?",
+            "expected_topics": [
+                "dress code"
+            ],
+            "expected_documents": [],
+            "fetched_document": "restaurant_faq.pdf",
+            "distance_top_chunk": "0.2501109241910129",
+            "retrieved_documents": [
+                "restaurant_faq.pdf",
+                "service_and_guest_experience.pdf"
+            ],
+            "any_relevant_document_retrieved": null,
+            "generated_response": "I am sorry, but the provided context does not contain information regarding whether the restaurant has a dress code.",
+            "is_match": null,
+            "input_tokens": 386,
+            "output_tokens": 704,
+            "total_tokens": 1090,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 21,
+            "category": "policies",
+            "query": "Can I bring my own cake?",
+            "expected_topics": [
+                "outside food",
+                "cake",
+                "restaurant policy"
+            ],
+            "expected_documents": [],
+            "fetched_document": "service_and_guest_experience.pdf",
+            "distance_top_chunk": "0.26406962298723624",
+            "retrieved_documents": [
+                "service_and_guest_experience.pdf",
+                "restaurant_faq.pdf"
+            ],
+            "any_relevant_document_retrieved": null,
+            "generated_response": "Based on the provided documents, there is no information specifying whether guests are allowed to bring their own cake. However, guests celebrating birthdays or anniversaries can request a small dessert message when making a reservation.",
+            "is_match": null,
+            "input_tokens": 391,
+            "output_tokens": 777,
+            "total_tokens": 1168,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 22,
+            "category": "policies",
+            "query": "Does the restaurant offer outdoor seating?",
+            "expected_topics": [
+                "outdoor seating"
+            ],
+            "expected_documents": [
+                "restaurant_policies.pdf"
+            ],
+            "fetched_document": "restaurant_policies.pdf",
+            "distance_top_chunk": "0.26640835991204603",
+            "retrieved_documents": [
+                "restaurant_policies.pdf",
+                "restaurant_faq.pdf"
+            ],
+            "any_relevant_document_retrieved": true,
+            "generated_response": "Yes, the restaurant offers outdoor seating on its patio. Guests can request patio tables when making a reservation.",
+            "is_match": true,
+            "input_tokens": 388,
+            "output_tokens": 716,
+            "total_tokens": 1104,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 23,
+            "category": "payments",
+            "query": "What payment methods are accepted?",
+            "expected_topics": [
+                "payment methods"
+            ],
+            "expected_documents": [
+                "delivery_and_orders.pdf"
+            ],
+            "fetched_document": "restaurant_faq.pdf",
+            "distance_top_chunk": "0.2600829666778691",
+            "retrieved_documents": [
+                "restaurant_faq.pdf",
+                "delivery_and_orders.pdf"
+            ],
+            "any_relevant_document_retrieved": true,
+            "generated_response": "Online orders can be paid using Visa, Mastercard, American Express, or digital wallets supported by the ordering platform. Cash is accepted for pickup orders.",
+            "is_match": false,
+            "input_tokens": 393,
+            "output_tokens": 913,
+            "total_tokens": 1306,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 25,
+            "category": "location",
+            "query": "Where is the restaurant located?",
+            "expected_topics": [
+                "address",
+                "location"
+            ],
+            "expected_documents": [],
+            "fetched_document": "restaurant_policies.pdf",
+            "distance_top_chunk": "0.31067335605619384",
+            "retrieved_documents": [
+                "restaurant_policies.pdf",
+                "service_and_guest_experience.pdf",
+                "events_private_dining.pdf"
+            ],
+            "any_relevant_document_retrieved": null,
+            "generated_response": "I am sorry, but the provided context does not contain information about the location of the restaurant.",
+            "is_match": null,
+            "input_tokens": 344,
+            "output_tokens": 695,
+            "total_tokens": 1039,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 26,
+            "category": "location",
+            "query": "Is parking available for customers?",
+            "expected_topics": [
+                "parking",
+                "location"
+            ],
+            "expected_documents": [],
+            "fetched_document": "restaurant_faq.pdf",
+            "distance_top_chunk": "0.30189704895017544",
+            "retrieved_documents": [
+                "restaurant_faq.pdf"
+            ],
+            "any_relevant_document_retrieved": null,
+            "generated_response": "Based on the provided context, there is no information available regarding whether parking is available for customers.",
+            "is_match": null,
+            "input_tokens": 384,
+            "output_tokens": 732,
+            "total_tokens": 1116,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 28,
+            "category": "events",
+            "query": "What services are available for private events?",
+            "expected_topics": [
+                "private events",
+                "event services"
+            ],
+            "expected_documents": [
+                "events_private_dining.pdf"
+            ],
+            "fetched_document": "events_private_dining.pdf",
+            "distance_top_chunk": "0.25034080435608486",
+            "retrieved_documents": [
+                "events_private_dining.pdf"
+            ],
+            "any_relevant_document_retrieved": true,
+            "generated_response": "Services available for private events include a fixed menu (such as a standard three-course option with a starter, main course, dessert, and vegetarian alternatives upon advance request), a private room equipped with Wi-Fi and a presentation screen for business events, and refreshment arrangements including coffee, tea, and non-alcoholic beverages.",
+            "is_match": true,
+            "input_tokens": 373,
+            "output_tokens": 667,
+            "total_tokens": 1040,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 29,
+            "category": "sustainability",
+            "query": "What sustainability practices does the restaurant follow?",
+            "expected_topics": [
+                "sustainability",
+                "environmental practices"
+            ],
+            "expected_documents": [],
+            "fetched_document": "events_private_dining.pdf",
+            "distance_top_chunk": "0.30347130606969386",
+            "retrieved_documents": [
+                "events_private_dining.pdf",
+                "service_and_guest_experience.pdf",
+                "restaurant_policies.pdf"
+            ],
+            "any_relevant_document_retrieved": null,
+            "generated_response": "I am sorry, but the provided context does not contain information about the restaurant's sustainability practices.",
+            "is_match": null,
+            "input_tokens": 375,
+            "output_tokens": 782,
+            "total_tokens": 1157,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        },
+        {
+            "id": 30,
+            "category": "multi-hop",
+            "query": "Can I bring my dog, sit outside, and order a vegetarian meal?",
+            "expected_topics": [
+                "pets",
+                "outdoor seating",
+                "vegetarian dishes"
+            ],
+            "expected_documents": [
+                "restaurant_policies.pdf",
+                "restaurant_menu.pdf"
+            ],
+            "fetched_document": "restaurant_faq.pdf",
+            "distance_top_chunk": "0.16299583470766377",
+            "retrieved_documents": [
+                "restaurant_faq.pdf",
+                "restaurant_policies.pdf"
+            ],
+            "any_relevant_document_retrieved": true,
+            "generated_response": "Yes, you can bring your dog and sit outside on the patio, as well as order a vegetarian meal. The menu includes several vegetarian dishes such as mushroom pasta, vegetable curry, garden salad, and roasted tomato soup, and dogs are welcome on the outdoor patio.",
+            "is_match": false,
+            "input_tokens": 412,
+            "output_tokens": 825,
+            "total_tokens": 1237,
+            "manual_calification": 0,
+            "manual_calification_setted": false
+        }
+    ]
+}

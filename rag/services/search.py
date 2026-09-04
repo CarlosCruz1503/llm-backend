@@ -1,11 +1,11 @@
 import logging
-from abc import ABC
 from functools import lru_cache
 
 from pgvector.django import CosineDistance
 
 from prompting.constants import DEFAULT_TOP_K_RETRIEVE_SIZE, RERANKER_MODEL, COSINE_DISTANCE_THRESHOLD
 from prompting.services.client import create_client_for_embedding, create_client_for_search, save_client_reponse_for_search
+from rag.constants import RERANKER_ENABLED
 from rag.models.document_chunk import DocumentChunkModel
 from rag.schemas.search import SearchSchema
 
@@ -26,13 +26,21 @@ def _get_reranker():
     return TextCrossEncoder(model_name=RERANKER_MODEL)
 
 
-class SearchService(ABC):
-    
-    def execute(self, search):
-        
+class SearchService:
+
+    # top_k/threshold/reranker_enabled are optional overrides (used by the RAG
+    # evaluation experiments to compare configurations); None falls back to
+    # the env-backed defaults, so normal callers are unaffected.
+    def execute(self, search, top_k=None, threshold=None, reranker_enabled=None):
+
         self.embbed_search(search)
-        
-        top_k_chunks = self.get_top_k_embeddings(search, top_limit=DEFAULT_TOP_K_RETRIEVE_SIZE)
+
+        top_k_chunks = self.get_top_k_embeddings(
+            search,
+            top_limit=top_k if top_k is not None else DEFAULT_TOP_K_RETRIEVE_SIZE,
+            threshold=threshold,
+            reranker_enabled=reranker_enabled,
+        )
 
         return self.get_search_response(search, top_k_chunks)
     
@@ -47,13 +55,15 @@ class SearchService(ABC):
             search.save()
             raise
 
-    def get_top_k_embeddings(self, search, top_limit) -> list[SearchSchema]:
+    def get_top_k_embeddings(self, search, top_limit, threshold=None, reranker_enabled=None) -> list[SearchSchema]:
         try:
+            distance_threshold = float(threshold) if threshold is not None else float(COSINE_DISTANCE_THRESHOLD)
+            use_reranker = reranker_enabled if reranker_enabled is not None else RERANKER_ENABLED
+
             chunks_with_distance = DocumentChunkModel.objects.annotate(
                 distance=CosineDistance("embedding", search.search_embedding)
             )
-            filter_chunks = chunks_with_distance.filter(distance__lte=COSINE_DISTANCE_THRESHOLD).order_by("distance")[:top_limit]
-
+            filter_chunks = chunks_with_distance.filter(distance__lte=distance_threshold).order_by("distance")[:top_limit]
             top_k_chunks = [
                 {
                     "document_name": chunk.document.file_name,
@@ -65,12 +75,13 @@ class SearchService(ABC):
                 for chunk in filter_chunks
             ]
 
-            re_rank_top = self.re_rank_top_k(search, top_k_chunks)
+            if use_reranker:
+                re_rank_top = self.re_rank_top_k(search, top_k_chunks)
 
-            for index, score in enumerate(re_rank_top, start=0):
-                top_k_chunks[index]["score"] = score
+                for index, score in enumerate(re_rank_top, start=0):
+                    top_k_chunks[index]["score"] = score
 
-            top_k_chunks.sort(key=lambda x: x["score"], reverse=True)
+                top_k_chunks.sort(key=lambda x: x["score"], reverse=True)
 
             return top_k_chunks
         except Exception as e:

@@ -3,7 +3,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from rag.models.document import DocumentModel
 from rag.serializers.document import DocumentSerializer
-from rest_framework.parsers import FileUploadParser
 class DocumentViewSet(viewsets.ModelViewSet):
     
     permission_classes = [IsAuthenticated]

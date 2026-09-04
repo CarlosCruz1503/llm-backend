@@ -3,7 +3,7 @@ from types import SimpleNamespace
 
 from chat.models.message import Message
 from prompting.schemas.message import messageOutputModel
-from rag.schemas.search import ResultSearchSchema, SearchSchema
+from rag.schemas.search import ResultSearchSchema
 
 from ..factory.output import promptsFactory
 from ..factory.provider import factoryProvider
@@ -119,11 +119,11 @@ def save_client_reponse_for_search(search, response):
         search.response_code = response["response_code"]
         search.request_id = response["id"]
         search.top_chunk_id = response["output_dict"]["chunk_id"]
-        search.distance_top_chunk = response["output_dict"]["distance_top_chunk"]
+        search.distance_top_chunk = response["output_dict"]["distance_top_chunk"] or 0.0
         search.response = response["output"]
         search.chunk_list = response["output_dict"]["chunk_list"]
         search.save()
         return search
     except Exception:
-        logger.exception("Failed to save the assistant's reply message")
+        logger.exception("Failed to save the search response")
         raise
