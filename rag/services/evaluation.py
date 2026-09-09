@@ -1,5 +1,5 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
-from prompting.constants import ProviderChoices
+from myapp.constants import ProviderChoices
 from rag.constants import DocumentStatusChoices
 from rag.models.document import DocumentModel
 from rag.models.document_chunk import DocumentChunkModel

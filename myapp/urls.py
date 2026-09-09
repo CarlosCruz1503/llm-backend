@@ -38,6 +38,7 @@ urlpatterns = [
     path("api/", include("prompting.urls")),
     path("api/", include("chat.urls")),
     path("api/", include("rag.urls")),
+    path("api/", include("restaurant.urls")),
     # Submit username/password to get 'access' and 'refresh' tokens
     path('api/token/', ThrottledTokenObtainPairView.as_view(), name='token_obtain_pair'),
 

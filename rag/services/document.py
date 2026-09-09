@@ -1,6 +1,6 @@
 import logging
 
-from prompting.constants import DEFAULT_OVERLAP_TOKENS_FOR_CHUNK, DEFAULT_TOKEN_MODEL, MAX_TOKENS_FOR_CHUNK
+from myapp.constants import DEFAULT_OVERLAP_TOKENS_FOR_CHUNK, DEFAULT_TOKEN_MODEL, MAX_TOKENS_FOR_CHUNK
 from rag.constants import DocumentStatusChoices
 from rag.models.document import DocumentModel
 from rag.services.chunks import create_and_save_chunks

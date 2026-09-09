@@ -1,12 +1,16 @@
 import logging
 from types import SimpleNamespace
 
+from agents.tools.create_reservation import CreateReservationTool
+from agents.tools.registry import ToolsRegistry
+from agents.tools.share_menu import ShareMenuTool
 from chat.models.message import Message
+from agents.schemas.tools import ToolResponse
 from prompting.schemas.message import messageOutputModel
 from rag.schemas.search import ResultSearchSchema
 
-from ..factory.output import promptsFactory
-from ..factory.provider import factoryProvider
+from prompting.factory.output import promptsFactory
+from prompting.factory.provider import factoryProvider
 
 logger = logging.getLogger(__name__)
 
@@ -28,13 +32,15 @@ def create_client_for_prompt(validated_data):
 def create_client_for_message(validated_data, conversation):
     try:
         client = factoryProvider(validated_data["provider"])
-        output_type_object = SimpleNamespace(structured_output=messageOutputModel)
-
+        # output_type_object = SimpleNamespace(structured_output=messageOutputModel)
+        output_type_object = SimpleNamespace(structured_output=ToolResponse)
+        available_tools = ToolsRegistry(tools=[CreateReservationTool, ShareMenuTool])
         return client(
             thinking_level=validated_data["thinking_level"],
             input=validated_data["content"],
             output_type=output_type_object,
             conversation=conversation,
+            available_tools=available_tools,
         )
     except Exception:
         logger.exception("Failed to build the provider client for a chat message")
@@ -126,4 +132,20 @@ def save_client_reponse_for_search(search, response):
         return search
     except Exception:
         logger.exception("Failed to save the search response")
+        raise
+    
+def create_client_for_agent(provider, content, available_tools):
+    try:
+        client = factoryProvider(provider)
+
+        output_type_object = SimpleNamespace(structured_output=ToolResponse)
+        
+        return client(
+            input=content,
+            available_tools=available_tools,
+            output_type=output_type_object,
+            # top_k=top_k
+        )
+    except Exception:
+        logger.exception("Failed to build the provider client for a chat message")
         raise

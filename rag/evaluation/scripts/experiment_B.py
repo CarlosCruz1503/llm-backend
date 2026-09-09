@@ -1,4 +1,4 @@
-from prompting.constants import ProviderChoices, TokenModelChoices
+from myapp.constants import ProviderChoices, TokenModelChoices
 from rag.services.evaluation import EvaluationService
 
 ###############################################################################################################

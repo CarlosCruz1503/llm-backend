@@ -2,7 +2,7 @@ import logging
 
 from celery import chord, shared_task
 
-from prompting.services.client import create_client_for_embedding
+from agents.services.client import create_client_for_embedding
 from rag.constants import DocumentStatusChoices
 from rag.models.document import DocumentModel
 from rag.models.document_chunk import DocumentChunkModel

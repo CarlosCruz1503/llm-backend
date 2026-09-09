@@ -13,7 +13,7 @@ stop:
 	docker compose stop
 
 bash:
-	docker exec -it core_prompt bash
+	docker exec -it core_ai_agent bash
 
 logs: 
 	docker compose logs --tail 100 -f 
@@ -23,28 +23,28 @@ restart:
 	make up
 
 migrations:
-	docker exec -it core_prompt python manage.py makemigrations
+	docker exec -it core_ai_agent python manage.py makemigrations
 
 migrate:
-	docker exec -it core_prompt python manage.py migrate
+	docker exec -it core_ai_agent python manage.py migrate
 
 superuser:
-	docker exec -it core_prompt python manage.py createsuperuser
+	docker exec -it core_ai_agent python manage.py createsuperuser
 
 test:
-	docker exec -it core_prompt python manage.py test
+	docker exec -it core_ai_agent python manage.py test
 
 lint:
-	docker exec -it core_prompt uv run ruff check .
+	docker exec -it core_ai_agent uv run ruff check .
 
 experiment_a:
-	docker exec -it core_prompt python manage.py shell -c "exec(open('rag/evaluation/scripts/experiment_A.py').read())"
+	docker exec -it core_ai_agent python manage.py shell -c "exec(open('rag/evaluation/scripts/experiment_A.py').read())"
 
 experiment_b:
-	docker exec -it core_prompt python manage.py shell -c "exec(open('rag/evaluation/scripts/experiment_B.py').read())"
+	docker exec -it core_ai_agent python manage.py shell -c "exec(open('rag/evaluation/scripts/experiment_B.py').read())"
 
 experiment_c:
-	docker exec -it core_prompt python manage.py shell -c "exec(open('rag/evaluation/scripts/experiment_C.py').read())"
+	docker exec -it core_ai_agent python manage.py shell -c "exec(open('rag/evaluation/scripts/experiment_C.py').read())"
 # Wipes all DB data (drops the db-data volume) and brings everything back up
 # on a clean, empty database. Migration *files* are untouched — `web`'s own
 # entrypoint (/start) already runs `migrate` on boot, so the schema is

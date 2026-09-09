@@ -1,4 +1,4 @@
-from ..providers.LLMs import GeminiProvider, OpenRouterProvider
+from agents.providers.LLMs import GeminiProvider, OpenRouterProvider
 
 models = {
     # "claude": ClaudeProvider,   # not implemented yet, see providers/LLMs/claude.py

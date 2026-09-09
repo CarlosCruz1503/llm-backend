@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     "prompting",
     "chat",
     'rag',
+    'agents',
+    'restaurant',
     'drf_spectacular',
 ]
 

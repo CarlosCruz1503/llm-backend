@@ -2,7 +2,7 @@ import logging
 
 from chat.models.conversation import Conversation
 from chat.models.message import Message
-from prompting.services.client import create_client_for_message, save_client_reponse_for_message
+from agents.services.client import create_client_for_message, save_client_reponse_for_message
 
 logger = logging.getLogger(__name__)
 

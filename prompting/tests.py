@@ -2,10 +2,10 @@ from django.test import SimpleTestCase
 
 from prompting.factory.output import promptsFactory
 from prompting.factory.provider import factoryProvider
-from prompting.providers.LLMs.gemini import GeminiProvider
-from prompting.providers.LLMs.open_router import OpenRouterProvider
-from prompting.providers.base import Provider
-from prompting.providers.prompts.text import PromptType
+from agents.providers.LLMs.gemini import GeminiProvider
+from agents.providers.LLMs.open_router import OpenRouterProvider
+from agents.providers.base import Provider
+from agents.providers.prompts.text import PromptType
 from prompting.schemas.prompt import SummarizeOutputModel, classifyOutputModel, keyWordsOutputModel
 
 

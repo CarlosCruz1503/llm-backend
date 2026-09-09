@@ -274,7 +274,7 @@ See `makefile` for the rest of the targets (`logs`, `bash`, `migrations`, `resta
 
 ## Testing & CI
 
-`make test` (or `docker exec -it core_prompt python manage.py test`) runs the suite; GitHub Actions (`.github/workflows/ci.yml`) runs `ruff check` and the same suite against a real `pgvector/pgvector` Postgres on every push/PR — the badge at the top of this README reflects that run, not a manually-updated claim.
+`make test` (or `docker exec -it core_ai_agent python manage.py test`) runs the suite; GitHub Actions (`.github/workflows/ci.yml`) runs `ruff check` and the same suite against a real `pgvector/pgvector` Postgres on every push/PR — the badge at the top of this README reflects that run, not a manually-updated claim.
 
 Coverage is deliberately targeted rather than exhaustive — the parts of the codebase where a bug wouldn't be obvious from just reading the code:
 

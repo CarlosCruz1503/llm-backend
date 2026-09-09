@@ -1,7 +1,7 @@
 from django.db import models
 
 from myapp.base import UserModel
-from prompting.constants import DEFAULT_THINKING_LEVEL, ProviderChoices, ThinkingLevelChoices
+from myapp.constants import DEFAULT_THINKING_LEVEL, ProviderChoices, ThinkingLevelChoices
 
 
 class OutputType(models.TextChoices):

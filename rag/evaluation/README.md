@@ -24,7 +24,7 @@ To generate the file `rag/evaluation/results/{experiment_name}_evaluation_result
 1. Run in the server the commands `make reset_db` and `make migrate` — this is for cleaning the DB and assuring a clean run of the tests.
 2. Run the script for the experiment that we want, these scripts are in `rag/evaluation/scripts/{experiment_name}.py`:
    ```bash
-   docker exec -it core_prompt python manage.py shell -c "exec(open('rag/evaluation/scripts/experiment_A.py').read())"
+   docker exec -it core_ai_agent python manage.py shell -c "exec(open('rag/evaluation/scripts/experiment_A.py').read())"
    ```
    (swap `experiment_A.py` for `experiment_B.py` / `experiment_C.py` to run the other configurations)
 3. Once `rag/evaluation/results/{experiment_name}_evaluation_results.json` is generated, open it and fill in `manual_calification` (a score you assign) and set `manual_calification_setted` to `true` for each question — this is a manual grading pass on top of the automatic `is_match` (fetched document vs. expected document) check, since matching the right source document doesn't guarantee the generated answer itself is good.

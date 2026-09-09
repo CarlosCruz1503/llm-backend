@@ -1,4 +1,4 @@
-from prompting.constants import ADMIN_LIST_DISPLAY
+from myapp.constants import ADMIN_LIST_DISPLAY
 from rag.models import DocumentChunkModel
 from django.contrib import admin
 

@@ -6,17 +6,17 @@ from typing import Dict
 from django.core.exceptions import ImproperlyConfigured
 from openrouter import OpenRouter
 
-from ...constants import DEFAULT_EMBEDDING_DIMENTIONS, OPENROUTER_API_KEY, OPENROUTER_EMBEDDING_MODEL, OPENROUTER_MODEL, SYSTEM_INSTRUCTION_FOR_CHAT
-from ..base import ChatProvider
+from myapp.constants import DEFAULT_EMBEDDING_DIMENTIONS, OPENROUTER_API_KEY, OPENROUTER_EMBEDDING_MODEL, OPENROUTER_MODEL, SYSTEM_INSTRUCTION_FOR_CHAT
+from ..base import ChatProvider, EmbeddingsProvider
 
 logger = logging.getLogger(__name__)
-class OpenRouterProvider(ChatProvider):
+class OpenRouterProvider(ChatProvider, EmbeddingsProvider):
 
     model: str = OPENROUTER_MODEL
     embedding_model = OPENROUTER_EMBEDDING_MODEL
 
-    def __init__(self, input, thinking_level="", output_type="", conversation=None, top_k=None):
-        super().__init__(input,thinking_level, output_type, conversation,top_k)
+    def __init__(self, input, thinking_level="", output_type="", conversation=None, top_k=None, available_tools=None):
+        super().__init__(input,thinking_level, output_type, conversation,top_k, available_tools)
         if not self.model or not OPENROUTER_API_KEY:
             raise ImproperlyConfigured(
                 "OPENROUTER_MODEL / OPENROUTER_API_KEY environment variables are not set; "

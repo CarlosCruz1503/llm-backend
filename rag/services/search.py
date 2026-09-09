@@ -3,8 +3,8 @@ from functools import lru_cache
 
 from pgvector.django import CosineDistance
 
-from prompting.constants import DEFAULT_TOP_K_RETRIEVE_SIZE, RERANKER_MODEL, COSINE_DISTANCE_THRESHOLD
-from prompting.services.client import create_client_for_embedding, create_client_for_search, save_client_reponse_for_search
+from myapp.constants import DEFAULT_TOP_K_RETRIEVE_SIZE, RERANKER_MODEL, COSINE_DISTANCE_THRESHOLD
+from agents.services.client import create_client_for_embedding, create_client_for_search, save_client_reponse_for_search
 from rag.constants import RERANKER_ENABLED
 from rag.models.document_chunk import DocumentChunkModel
 from rag.schemas.search import SearchSchema

@@ -2,8 +2,9 @@ import logging
 
 from myapp.serializers.base import BaseSerializer
 
+from agents.services.client import create_client_for_prompt, save_client_reponse_for_prompt
+
 from ..models import PromptModel
-from ..services.client import create_client_for_prompt, save_client_reponse_for_prompt
 
 logger = logging.getLogger(__name__)
 

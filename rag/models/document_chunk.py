@@ -3,7 +3,7 @@
 
 from django.db import models
 from myapp.base.models import BaseModel
-from prompting.constants import DEFAULT_EMBEDDING_DIMENTIONS, ProviderChoices, TokenModelChoices
+from myapp.constants import DEFAULT_EMBEDDING_DIMENTIONS, ProviderChoices, TokenModelChoices
 from rag.models.document import DocumentModel
 from pgvector.django import VectorField
 from pgvector.django import HnswIndex

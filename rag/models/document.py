@@ -1,7 +1,7 @@
 from django.db import models
 
 from myapp.base.models import BaseModel
-from prompting.constants import ProviderChoices
+from myapp.constants import ProviderChoices
 from rag.constants import DEFAULT_DOCUMENT_STATUS, DocumentStatusChoices
 
 class DocumentModel(BaseModel):

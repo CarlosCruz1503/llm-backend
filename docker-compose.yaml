@@ -1,6 +1,6 @@
 services:
   web:
-    container_name: core_prompt
+    container_name: core_ai_agent
     build:
       context: .
       # Build the development stage from the multi-stage Dockerfile.

@@ -3,7 +3,7 @@
 from pgvector.django import HnswIndex, VectorField
 from myapp.base.models import UserModel
 from django.db import models
-from prompting.constants import DEFAULT_EMBEDDING_DIMENTIONS, ProviderChoices
+from myapp.constants import DEFAULT_EMBEDDING_DIMENTIONS, ProviderChoices
 from rag.models.document_chunk import DocumentChunkModel
 class SearchModel(UserModel):
     

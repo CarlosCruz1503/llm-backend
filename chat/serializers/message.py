@@ -3,7 +3,7 @@ from rest_framework import serializers
 from chat.models.conversation import Conversation
 from chat.services.conversation import ConversationService
 from myapp.serializers.base import BaseSerializer
-from prompting.constants import DEFAULT_THINKING_LEVEL, ProviderChoices, ThinkingLevelChoices
+from myapp.constants import DEFAULT_THINKING_LEVEL, ProviderChoices, ThinkingLevelChoices
 
 from ..models import Message
 

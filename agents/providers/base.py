@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict
 
 from chat.services.history import get_history_messages
-from prompting.constants import MAX_TOKENS_FOR_CHAT_CONTEXTS
+from myapp.constants import MAX_TOKENS_FOR_CHAT_CONTEXTS
 
 logger = logging.getLogger(__name__)
 
@@ -15,14 +15,16 @@ class Provider(ABC):
     output_type: str
     conversation: int = None
     top_k: list = None
+    available_tools: list = None
     client: Any
 
-    def __init__(self, input, thinking_level="", output_type="", conversation=None, top_k=None):
+    def __init__(self, input, thinking_level="", output_type="", conversation=None, top_k=None, available_tools=None):
         self.thinking_level = thinking_level
         self.input = input
         self.output_type = output_type
         self.conversation = conversation
         self.top_k = top_k
+        self.available_tools = available_tools
 
     @abstractmethod
     def execute(self, is_chat=False):
