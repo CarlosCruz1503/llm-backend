@@ -211,7 +211,7 @@ class EvaluationService:
             })
 
             # Basic rate-limiting pause between LLM calls.
-            time.sleep(90)
+            time.sleep(120)
 
         # Output payload containing config and results
         output_payload = {

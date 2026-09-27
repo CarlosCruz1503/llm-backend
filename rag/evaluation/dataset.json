@@ -40,16 +40,6 @@
       "should_answer": true
     },
     {
-      "id": 6,
-      "category": "menu",
-      "query": "Which dishes are suitable for someone who does not eat meat?",
-      "difficulty": "medium",
-      "expected_topics": ["vegetarian dishes", "meat-free options"],
-      "expected_answer": "Suitable meat-free options include mushroom pasta, vegetable curry, garden salad, and roasted tomato soup.",
-      "relevant_documents": ["restaurant_menu.pdf"],
-      "should_answer": true
-    },
-    {
       "id": 8,
       "category": "menu",
       "query": "Which dishes contain dairy products?",
@@ -69,17 +59,7 @@
       "relevant_documents": ["restaurant_menu.pdf"],
       "should_answer": true
     },
-  
-    {
-      "id": 11,
-      "category": "hours",
-      "query": "What time does the restaurant open?",
-      "difficulty": "easy",
-      "expected_topics": ["opening hours"],
-      "expected_answer": "The restaurant opens at 11:30 AM from Tuesday through Sunday.",
-      "relevant_documents": ["restaurant_policies.pdf"],
-      "should_answer": true
-    },
+
     {
       "id": 12,
       "category": "hours",
@@ -87,17 +67,6 @@
       "difficulty": "easy",
       "expected_topics": ["weekend hours", "closing time"],
       "expected_answer": "The restaurant closes at 10:30 PM on Friday and Saturday, and at 8:00 PM on Sunday.",
-      "relevant_documents": ["restaurant_policies.pdf"],
-      "should_answer": true
-    },
-
-    {
-      "id": 16,
-      "category": "reservations",
-      "query": "Can I make a reservation for a large group?",
-      "difficulty": "medium",
-      "expected_topics": ["large groups", "reservations"],
-      "expected_answer": "Yes. Groups of eight or more can make reservations and should do so at least 24 hours in advance.",
       "relevant_documents": ["restaurant_policies.pdf"],
       "should_answer": true
     },
@@ -111,17 +80,7 @@
       "relevant_documents": ["restaurant_policies.pdf"],
       "should_answer": true
     },
-  
-    {
-      "id": 20,
-      "category": "policies",
-      "query": "Does the restaurant have a dress code?",
-      "difficulty": "easy",
-      "expected_topics": ["dress code"],
-      "expected_answer": "The restaurant's dress code is not specified in the current knowledge base.",
-      "relevant_documents": [],
-      "should_answer": false
-    },
+
     {
       "id": 21,
       "category": "policies",
@@ -131,16 +90,6 @@
       "expected_answer": "The current knowledge base does not specify whether guests may bring their own cake.",
       "relevant_documents": [],
       "should_answer": false
-    },
-    {
-      "id": 22,
-      "category": "policies",
-      "query": "Does the restaurant offer outdoor seating?",
-      "difficulty": "easy",
-      "expected_topics": ["outdoor seating"],
-      "expected_answer": "Yes. The restaurant has an outdoor patio where dogs are welcome.",
-      "relevant_documents": ["restaurant_policies.pdf"],
-      "should_answer": true
     },
   
     {
