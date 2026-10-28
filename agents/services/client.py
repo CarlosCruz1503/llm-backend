@@ -124,7 +124,7 @@ def save_client_reponse_for_search(search, response):
         search.status = response["status"]
         search.response_code = response["response_code"]
         search.request_id = response["id"]
-        search.top_chunk_id = response["output_dict"]["chunk_id"]
+        search.top_chunk_id = response["output_dict"]["chunk_id"] if response["output_dict"]["chunk_id"] else None
         search.distance_top_chunk = response["output_dict"]["distance_top_chunk"] or 0.0
         search.response = response["output"]
         search.chunk_list = response["output_dict"]["chunk_list"]

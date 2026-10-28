@@ -8,7 +8,7 @@
         "cosine_distance_threshold": 2.0,
         "reranker_enable": false
     },
-    "total_questions": 20,
+    "total_questions": 17,
     "results": [
         {
             "id": 1,
@@ -29,11 +29,11 @@
             "any_relevant_document_retrieved": true,
             "generated_response": "The available vegetarian dishes are mushroom pasta, vegetable curry, garden salad, and roasted tomato soup.",
             "is_match": false,
-            "input_tokens": 423,
-            "output_tokens": 808,
-            "total_tokens": 1231,
-            "manual_calification": 0,
-            "manual_calification_setted": false
+            "input_tokens": 424,
+            "output_tokens": 746,
+            "total_tokens": 1170,
+            "manual_calification": 3,
+            "manual_calification_setted": true
         },
         {
             "id": 2,
@@ -55,35 +55,10 @@
             "generated_response": "The main ingredients in the grilled chicken dish (Grilled chicken bowl) are grilled chicken, roasted vegetables, rice, and herb sauce.",
             "is_match": true,
             "input_tokens": 433,
-            "output_tokens": 712,
-            "total_tokens": 1145,
-            "manual_calification": 0,
-            "manual_calification_setted": false
-        },
-        {
-            "id": 3,
-            "category": "menu",
-            "query": "Which dishes contain seafood?",
-            "expected_topics": [
-                "seafood dishes"
-            ],
-            "expected_documents": [
-                "restaurant_menu.pdf",
-                "allergen_guide.pdf"
-            ],
-            "fetched_document": "allergen_guide.pdf",
-            "distance_top_chunk": "0.28159788971096167",
-            "retrieved_documents": [
-                "allergen_guide.pdf"
-            ],
-            "any_relevant_document_retrieved": true,
-            "generated_response": "Based on the provided allergen guide, the dishes that contain seafood are Grilled Salmon (which contains fish) and Crispy Calamari (which contains shellfish).",
-            "is_match": true,
-            "input_tokens": 358,
-            "output_tokens": 801,
-            "total_tokens": 1159,
-            "manual_calification": 0,
-            "manual_calification_setted": false
+            "output_tokens": 617,
+            "total_tokens": 1050,
+            "manual_calification": 5,
+            "manual_calification_setted": true
         },
         {
             "id": 5,
@@ -97,18 +72,18 @@
                 "restaurant_menu.pdf"
             ],
             "fetched_document": "restaurant_menu.pdf",
-            "distance_top_chunk": "0.32846935995989324",
+            "distance_top_chunk": "0.35426206759743206",
             "retrieved_documents": [
                 "restaurant_menu.pdf"
             ],
             "any_relevant_document_retrieved": true,
-            "generated_response": "Based on the provided menu, the most expensive main course is the Grilled salmon, which costs $21.",
+            "generated_response": "Based on the menu provided, the most expensive main course is the Grilled salmon, priced at $21.",
             "is_match": true,
             "input_tokens": 394,
-            "output_tokens": 1120,
-            "total_tokens": 1514,
-            "manual_calification": 0,
-            "manual_calification_setted": false
+            "output_tokens": 699,
+            "total_tokens": 1093,
+            "manual_calification": 5,
+            "manual_calification_setted": true
         },
         {
             "id": 6,
@@ -128,13 +103,13 @@
                 "restaurant_faq.pdf"
             ],
             "any_relevant_document_retrieved": true,
-            "generated_response": "Dishes suitable for someone who does not eat meat include mushroom pasta, vegetable curry, garden salad, and roasted tomato soup.",
+            "generated_response": "The dishes suitable for someone who does not eat meat (vegetarian options) are the mushroom pasta, vegetable curry, garden salad, and roasted tomato soup.",
             "is_match": true,
-            "input_tokens": 429,
-            "output_tokens": 884,
-            "total_tokens": 1313,
-            "manual_calification": 0,
-            "manual_calification_setted": false
+            "input_tokens": 430,
+            "output_tokens": 604,
+            "total_tokens": 1034,
+            "manual_calification": 5,
+            "manual_calification_setted": true
         },
         {
             "id": 8,
@@ -155,13 +130,13 @@
                 "restaurant_menu.pdf"
             ],
             "any_relevant_document_retrieved": true,
-            "generated_response": "Based on the provided allergen guide, the mushroom pasta contains dairy in its standard preparation.",
+            "generated_response": "Based on the provided documents, the mushroom pasta contains dairy in its standard preparation.",
             "is_match": true,
-            "input_tokens": 415,
-            "output_tokens": 833,
-            "total_tokens": 1248,
-            "manual_calification": 0,
-            "manual_calification_setted": false
+            "input_tokens": 416,
+            "output_tokens": 603,
+            "total_tokens": 1019,
+            "manual_calification": 2,
+            "manual_calification_setted": true
         },
         {
             "id": 10,
@@ -175,44 +150,19 @@
                 "restaurant_menu.pdf"
             ],
             "fetched_document": "restaurant_menu.pdf",
-            "distance_top_chunk": "0.34710987737406873",
+            "distance_top_chunk": "0.32908586610382873",
             "retrieved_documents": [
                 "restaurant_menu.pdf",
                 "restaurant_faq.pdf"
             ],
             "any_relevant_document_retrieved": true,
-            "generated_response": "For a light lunch at The Garden Table, you could order the Roasted Tomato Soup ($7) or the Garden Salad.",
+            "generated_response": "For a light lunch, I recommend the roasted tomato soup ($7) or the garden salad from The Garden Table.",
             "is_match": true,
-            "input_tokens": 415,
-            "output_tokens": 797,
-            "total_tokens": 1212,
-            "manual_calification": 0,
-            "manual_calification_setted": false
-        },
-        {
-            "id": 11,
-            "category": "hours",
-            "query": "What time does the restaurant open?",
-            "expected_topics": [
-                "opening hours"
-            ],
-            "expected_documents": [
-                "restaurant_policies.pdf"
-            ],
-            "fetched_document": "restaurant_policies.pdf",
-            "distance_top_chunk": "0.25405185802490526",
-            "retrieved_documents": [
-                "restaurant_policies.pdf",
-                "restaurant_faq.pdf"
-            ],
-            "any_relevant_document_retrieved": true,
-            "generated_response": "The Garden Table opens at 11:30 AM Tuesday through Sunday. It is closed on Mondays.",
-            "is_match": true,
-            "input_tokens": 401,
-            "output_tokens": 920,
-            "total_tokens": 1321,
-            "manual_calification": 0,
-            "manual_calification_setted": false
+            "input_tokens": 416,
+            "output_tokens": 981,
+            "total_tokens": 1397,
+            "manual_calification": 3,
+            "manual_calification_setted": true
         },
         {
             "id": 12,
@@ -235,10 +185,10 @@
             "generated_response": "On weekends, the restaurant closes at 10:30 PM on Friday and Saturday, and at 8:00 PM on Sunday.",
             "is_match": true,
             "input_tokens": 415,
-            "output_tokens": 855,
-            "total_tokens": 1270,
-            "manual_calification": 0,
-            "manual_calification_setted": false
+            "output_tokens": 896,
+            "total_tokens": 1311,
+            "manual_calification": 5,
+            "manual_calification_setted": true
         },
         {
             "id": 16,
@@ -257,39 +207,13 @@
                 "restaurant_faq.pdf"
             ],
             "any_relevant_document_retrieved": false,
-            "generated_response": "Yes, you can make a reservation for a large group. Groups of eight or more should make a reservation at least 24 hours in advance.",
+            "generated_response": "Yes. Groups of eight or more should make a reservation at least 24 hours in advance.",
             "is_match": false,
             "input_tokens": 385,
-            "output_tokens": 769,
-            "total_tokens": 1154,
-            "manual_calification": 0,
-            "manual_calification_setted": false
-        },
-        {
-            "id": 18,
-            "category": "reservations",
-            "query": "Can I modify an existing reservation?",
-            "expected_topics": [
-                "reservation modification",
-                "reservations"
-            ],
-            "expected_documents": [
-                "restaurant_policies.pdf"
-            ],
-            "fetched_document": "restaurant_faq.pdf",
-            "distance_top_chunk": "0.2757559695926117",
-            "retrieved_documents": [
-                "restaurant_faq.pdf",
-                "restaurant_policies.pdf"
-            ],
-            "any_relevant_document_retrieved": true,
-            "generated_response": "Based on the provided documents, there is no specific information regarding whether you can modify an existing reservation. However, you can cancel your reservation without a fee up to two hours before the reservation time.",
-            "is_match": false,
-            "input_tokens": 381,
-            "output_tokens": 826,
-            "total_tokens": 1207,
-            "manual_calification": 0,
-            "manual_calification_setted": false
+            "output_tokens": 751,
+            "total_tokens": 1136,
+            "manual_calification": 4,
+            "manual_calification_setted": true
         },
         {
             "id": 20,
@@ -306,38 +230,13 @@
                 "service_and_guest_experience.pdf"
             ],
             "any_relevant_document_retrieved": null,
-            "generated_response": "I am sorry, but the provided context does not contain information regarding whether the restaurant has a dress code.",
+            "generated_response": "I am sorry, but the provided chunks do not contain information about whether the restaurant has a dress code.",
             "is_match": null,
             "input_tokens": 386,
-            "output_tokens": 704,
-            "total_tokens": 1090,
-            "manual_calification": 0,
-            "manual_calification_setted": false
-        },
-        {
-            "id": 21,
-            "category": "policies",
-            "query": "Can I bring my own cake?",
-            "expected_topics": [
-                "outside food",
-                "cake",
-                "restaurant policy"
-            ],
-            "expected_documents": [],
-            "fetched_document": "service_and_guest_experience.pdf",
-            "distance_top_chunk": "0.26406962298723624",
-            "retrieved_documents": [
-                "service_and_guest_experience.pdf",
-                "restaurant_faq.pdf"
-            ],
-            "any_relevant_document_retrieved": null,
-            "generated_response": "Based on the provided documents, there is no information specifying whether guests are allowed to bring their own cake. However, guests celebrating birthdays or anniversaries can request a small dessert message when making a reservation.",
-            "is_match": null,
-            "input_tokens": 391,
-            "output_tokens": 777,
-            "total_tokens": 1168,
-            "manual_calification": 0,
-            "manual_calification_setted": false
+            "output_tokens": 1051,
+            "total_tokens": 1437,
+            "manual_calification": 2,
+            "manual_calification_setted": true
         },
         {
             "id": 22,
@@ -349,20 +248,20 @@
             "expected_documents": [
                 "restaurant_policies.pdf"
             ],
-            "fetched_document": "restaurant_policies.pdf",
+            "fetched_document": "restaurant_faq.pdf",
             "distance_top_chunk": "0.26640835991204603",
             "retrieved_documents": [
                 "restaurant_policies.pdf",
                 "restaurant_faq.pdf"
             ],
             "any_relevant_document_retrieved": true,
-            "generated_response": "Yes, the restaurant offers outdoor seating on its patio. Guests can request patio tables when making a reservation.",
-            "is_match": true,
+            "generated_response": "Yes, the restaurant offers outdoor seating on its outdoor patio.",
+            "is_match": false,
             "input_tokens": 388,
-            "output_tokens": 716,
-            "total_tokens": 1104,
-            "manual_calification": 0,
-            "manual_calification_setted": false
+            "output_tokens": 653,
+            "total_tokens": 1041,
+            "manual_calification": 2,
+            "manual_calification_setted": true
         },
         {
             "id": 23,
@@ -381,13 +280,13 @@
                 "delivery_and_orders.pdf"
             ],
             "any_relevant_document_retrieved": true,
-            "generated_response": "Online orders can be paid using Visa, Mastercard, American Express, or digital wallets supported by the ordering platform. Cash is accepted for pickup orders.",
+            "generated_response": "Online orders accept Visa, Mastercard, American Express, and digital wallets supported by the ordering platform. Pickup orders can also be paid with cash.",
             "is_match": false,
             "input_tokens": 393,
-            "output_tokens": 913,
-            "total_tokens": 1306,
-            "manual_calification": 0,
-            "manual_calification_setted": false
+            "output_tokens": 859,
+            "total_tokens": 1252,
+            "manual_calification": 5,
+            "manual_calification_setted": true
         },
         {
             "id": 25,
@@ -406,13 +305,13 @@
                 "events_private_dining.pdf"
             ],
             "any_relevant_document_retrieved": null,
-            "generated_response": "I am sorry, but the provided context does not contain information about the location of the restaurant.",
+            "generated_response": "I am sorry, but the provided text chunks do not contain information regarding the location of the restaurant.",
             "is_match": null,
             "input_tokens": 344,
-            "output_tokens": 695,
-            "total_tokens": 1039,
-            "manual_calification": 0,
-            "manual_calification_setted": false
+            "output_tokens": 806,
+            "total_tokens": 1150,
+            "manual_calification": 5,
+            "manual_calification_setted": true
         },
         {
             "id": 26,
@@ -429,13 +328,13 @@
                 "restaurant_faq.pdf"
             ],
             "any_relevant_document_retrieved": null,
-            "generated_response": "Based on the provided context, there is no information available regarding whether parking is available for customers.",
+            "generated_response": "I am sorry, but the provided text does not contain information about whether parking is available for customers.",
             "is_match": null,
             "input_tokens": 384,
-            "output_tokens": 732,
-            "total_tokens": 1116,
-            "manual_calification": 0,
-            "manual_calification_setted": false
+            "output_tokens": 889,
+            "total_tokens": 1273,
+            "manual_calification": 5,
+            "manual_calification_setted": true
         },
         {
             "id": 28,
@@ -459,8 +358,8 @@
             "input_tokens": 373,
             "output_tokens": 667,
             "total_tokens": 1040,
-            "manual_calification": 0,
-            "manual_calification_setted": false
+            "manual_calification": 3,
+            "manual_calification_setted": true
         },
         {
             "id": 29,
@@ -484,8 +383,8 @@
             "input_tokens": 375,
             "output_tokens": 782,
             "total_tokens": 1157,
-            "manual_calification": 0,
-            "manual_calification_setted": false
+            "manual_calification": 1,
+            "manual_calification_setted": true
         },
         {
             "id": 30,
@@ -512,8 +411,8 @@
             "input_tokens": 412,
             "output_tokens": 825,
             "total_tokens": 1237,
-            "manual_calification": 0,
-            "manual_calification_setted": false
+            "manual_calification": 4,
+            "manual_calification_setted": true
         }
     ]
 }

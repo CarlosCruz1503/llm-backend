@@ -20,22 +20,22 @@
       "should_answer": true
     },
     {
-      "id": 3,
-      "category": "menu",
-      "query": "Which dishes contain seafood?",
-      "difficulty": "easy",
-      "expected_topics": ["seafood dishes"],
-      "expected_answer": "The seafood dishes include crispy calamari and grilled salmon.",
-      "relevant_documents": ["restaurant_menu.pdf", "allergen_guide.pdf"],
-      "should_answer": true
-    },
-    {
       "id": 5,
       "category": "menu",
       "query": "What is the most expensive main course?",
       "difficulty": "medium",
       "expected_topics": ["main courses", "prices"],
       "expected_answer": "The grilled salmon is the most expensive main course at $21.",
+      "relevant_documents": ["restaurant_menu.pdf"],
+      "should_answer": true
+    },
+    {
+      "id": 6,
+      "category": "menu",
+      "query": "Which dishes are suitable for someone who does not eat meat?",
+      "difficulty": "medium",
+      "expected_topics": ["vegetarian dishes", "meat-free options"],
+      "expected_answer": "Suitable meat-free options include mushroom pasta, vegetable curry, garden salad, and roasted tomato soup.",
       "relevant_documents": ["restaurant_menu.pdf"],
       "should_answer": true
     },
@@ -59,7 +59,17 @@
       "relevant_documents": ["restaurant_menu.pdf"],
       "should_answer": true
     },
-
+  
+    {
+      "id": 11,
+      "category": "hours",
+      "query": "What time does the restaurant open?",
+      "difficulty": "easy",
+      "expected_topics": ["opening hours"],
+      "expected_answer": "The restaurant opens at 11:30 AM from Tuesday through Sunday.",
+      "relevant_documents": ["restaurant_policies.pdf"],
+      "should_answer": true
+    },
     {
       "id": 12,
       "category": "hours",
@@ -70,26 +80,37 @@
       "relevant_documents": ["restaurant_policies.pdf"],
       "should_answer": true
     },
+
     {
-      "id": 18,
+      "id": 16,
       "category": "reservations",
-      "query": "Can I modify an existing reservation?",
+      "query": "Can I make a reservation for a large group?",
       "difficulty": "medium",
-      "expected_topics": ["reservation modification", "reservations"],
-      "expected_answer": "The available restaurant policies do not specify a formal reservation modification policy. Guests should contact the restaurant to request a change.",
+      "expected_topics": ["large groups", "reservations"],
+      "expected_answer": "Yes. Groups of eight or more can make reservations and should do so at least 24 hours in advance.",
       "relevant_documents": ["restaurant_policies.pdf"],
       "should_answer": true
     },
-
+  
     {
-      "id": 21,
+      "id": 20,
       "category": "policies",
-      "query": "Can I bring my own cake?",
-      "difficulty": "medium",
-      "expected_topics": ["outside food", "cake", "restaurant policy"],
-      "expected_answer": "The current knowledge base does not specify whether guests may bring their own cake.",
+      "query": "Does the restaurant have a dress code?",
+      "difficulty": "easy",
+      "expected_topics": ["dress code"],
+      "expected_answer": "The restaurant's dress code is not specified in the current knowledge base.",
       "relevant_documents": [],
       "should_answer": false
+    },
+    {
+      "id": 22,
+      "category": "policies",
+      "query": "Does the restaurant offer outdoor seating?",
+      "difficulty": "easy",
+      "expected_topics": ["outdoor seating"],
+      "expected_answer": "Yes. The restaurant has an outdoor patio where dogs are welcome.",
+      "relevant_documents": ["restaurant_policies.pdf"],
+      "should_answer": true
     },
   
     {
