@@ -26,3 +26,6 @@ celerybeat-schedule-wal
 .vscode/
 .idea/
 .DS_Store
+
+# RAG evaluation machine-local state (document ids in this DB, cached query vectors)
+rag/evaluation/.cache/

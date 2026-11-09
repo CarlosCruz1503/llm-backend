@@ -3,21 +3,21 @@ from pydantic import BaseModel, Field
 class SearchSchema(BaseModel):
 
     
-    document_name: str = Field("The name of the document where the chunk was extracted")
-    cosine_distance: float = Field("The cosine distance between the search vector and the chunk")
-    chunk_text: str = Field("The chunk text that was vectorized and compared with the vectorized search")
-    chunk_id: str = Field("The ID of the chunk, just return to id of the top one")
-    score: float | None = Field("The Re rank score of the chunk")
+    document_name: str = Field(description="The name of the document where the chunk was extracted")
+    cosine_distance: float = Field(description="The cosine distance between the search vector and the chunk")
+    chunk_text: str = Field(description="The chunk text that was vectorized and compared with the vectorized search")
+    chunk_id: str = Field(description="The ID of the chunk")
+    score: float | None = Field(description="The Re rank score of the chunk")
     
 class ResultCunkListSchema(BaseModel):
     
-    chunk_id: int = Field("The Id of the chunk")  
-    cosine_distance: float = Field("The cosine distance between the search vector and the chunk") 
-    score: float | None = Field("The Re rank score of the chunk")
+    chunk_id: int = Field(description="The Id of the chunk")  
+    cosine_distance: float = Field(description="The cosine distance between the search vector and the chunk") 
+    score: float | None = Field(description="The Re rank score of the chunk")
      
 class ResultSearchSchema(BaseModel):
     
-    text: str = Field("The response for the search of answer input")
-    chunk_id: str = Field("The ID for the top chunk selected for the response, just return to id of the top one")
-    distance_top_chunk: str = Field("The cosine distance with the selected chunk for the response")
+    text: str = Field(description="The response for the search of answer input")
+    chunk_id: str = Field(description="The ID for the top chunk selected for the response, just return the id of the top one")
+    distance_top_chunk: str = Field(description="The cosine distance with the selected chunk for the response")
     chunk_list: list[ResultCunkListSchema]

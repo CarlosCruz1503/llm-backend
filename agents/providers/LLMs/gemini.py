@@ -68,14 +68,16 @@ class GeminiProvider(ChatProvider, EmbeddingsProvider):
     def execute(self, is_chat=False, is_search=False, retry=0):
         try:
         
+            # Only chat runs as the restaurant agent; prompt/search/evaluation
+            # calls have no tools and must not get the agent's instructions.
             response = self.client.models.generate_content(
                 model=self.model,
                 contents=self.build_context(is_chat, is_search),
                 config=types.GenerateContentConfig(
-                    tools=self.available_tools.get_tools_schemas(),
+                    tools=self.available_tools.get_tools_schemas() if self.available_tools else None,
                     response_mime_type='application/json',
                     response_json_schema=self.output_type.structured_output.model_json_schema(),
-                    system_instruction=AGENT_RESTAURANT_DEFAULT_INPUT
+                    system_instruction=AGENT_RESTAURANT_DEFAULT_INPUT if is_chat else None
                 )
             )
             if not is_chat:
@@ -159,6 +161,24 @@ class GeminiProvider(ChatProvider, EmbeddingsProvider):
             return embedding_response.embeddings[0].values
         except Exception:
             logger.exception("Failed to generate Gemini embedding")
+            raise
+
+    def embed_contents(self):
+        # Batched variant: `input` is a list of texts, embedded in one request.
+        # Each text goes in its own Content: some models (gemini-embedding-2)
+        # merge a plain list of strings into a single embedding.
+        try:
+            embedding_response = self.client.models.embed_content(
+                model=self.embedding_model,
+                contents=[types.Content(parts=[types.Part(text=text)]) for text in self.input],
+                config=types.EmbedContentConfig(output_dimensionality=DEFAULT_EMBEDDING_DIMENTIONS)
+            )
+            embeddings = embedding_response.embeddings
+            if len(embeddings) != len(self.input):
+                raise ValueError(f"Expected {len(self.input)} embeddings from {self.embedding_model}, got {len(embeddings)}")
+            return [embedding.values for embedding in embeddings]
+        except Exception:
+            logger.exception("Failed to generate Gemini embeddings")
             raise
         
     def transform_agent_response(self, response):

@@ -28,6 +28,9 @@ class SearchModel(UserModel):
     distance_top_chunk = models.FloatField(null=True, blank=True) 
     
     chunk_list = models.JSONField(default=list)
+    # What pgvector (and the reranker, if enabled) actually returned, in rank
+    # order. chunk_list above is the LLM's own account of what it used.
+    retrieved_chunks = models.JSONField(default=list)
     
     class Meta:
         indexes = [

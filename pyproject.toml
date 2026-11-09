@@ -30,6 +30,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "fpdf2>=2.8.9",
     "ruff>=0.16.6",
 ]
 

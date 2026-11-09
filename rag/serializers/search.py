@@ -38,6 +38,9 @@ class SearchSerializer(BaseSerializer):
                 top_k=search_config.get("top_k"),
                 threshold=search_config.get("threshold"),
                 reranker_enabled=search_config.get("reranker_enabled"),
+                rerank_top_n=search_config.get("rerank_top_n"),
+                document_ids=search_config.get("document_ids"),
+                query_embedding=search_config.get("query_embedding"),
             )
         except Exception:
             # SearchService already records the failure on `search_instance.error`

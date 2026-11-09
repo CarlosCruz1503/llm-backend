@@ -3,11 +3,10 @@ from functools import lru_cache
 
 from pgvector.django import CosineDistance
 
-from myapp.constants import DEFAULT_TOP_K_RETRIEVE_SIZE, RERANKER_MODEL, COSINE_DISTANCE_THRESHOLD
+from myapp.constants import DEFAULT_TOP_K_RETRIEVE_SIZE, RERANK_TOP_N, RERANKER_MODEL, COSINE_DISTANCE_THRESHOLD
 from agents.services.client import create_client_for_embedding, create_client_for_search, save_client_reponse_for_search
 from rag.constants import RERANKER_ENABLED
 from rag.models.document_chunk import DocumentChunkModel
-from rag.schemas.search import SearchSchema
 
 logger = logging.getLogger(__name__)
 
@@ -26,21 +25,86 @@ def _get_reranker():
     return TextCrossEncoder(model_name=RERANKER_MODEL)
 
 
+def retrieve_chunks(query_text, query_embedding, top_k=None, threshold=None, reranker_enabled=None,
+                    rerank_top_n=None, document_ids=None) -> list[dict]:
+    """Ranked chunks for a query, without calling the LLM.
+
+    Without the reranker, returns the `top_k` nearest chunks under the cosine
+    distance threshold. With it, `top_k` is the candidate pool: the reranker
+    scores the pool and only the best `rerank_top_n` are kept, so the context
+    sent to the LLM shrinks instead of just being reordered.
+
+    `document_ids` restricts the search to a set of documents (the evaluation
+    keeps one corpus per chunking configuration in the same table).
+    """
+    top_k = top_k if top_k is not None else DEFAULT_TOP_K_RETRIEVE_SIZE
+    distance_threshold = float(threshold) if threshold is not None else float(COSINE_DISTANCE_THRESHOLD)
+    use_reranker = reranker_enabled if reranker_enabled is not None else RERANKER_ENABLED
+
+    queryset = DocumentChunkModel.objects.select_related("document")
+    if document_ids is not None:
+        queryset = queryset.filter(document_id__in=document_ids)
+
+    nearest = (
+        queryset.annotate(distance=CosineDistance("embedding", query_embedding))
+        .filter(distance__lte=distance_threshold)
+        .order_by("distance")[:top_k]
+    )
+    chunks = [
+        {
+            "document_name": chunk.document.file_name,
+            "cosine_distance": chunk.distance,
+            "chunk_text": chunk.contextual_text,
+            "chunk_id": chunk.id,
+            "score": None,
+        }
+        for chunk in nearest
+    ]
+
+    if use_reranker and chunks:
+        reranker = _get_reranker()
+        scores = reranker.rerank(query=query_text, documents=[c["chunk_text"] for c in chunks])
+        for chunk, score in zip(chunks, scores):
+            chunk["score"] = float(score)
+        chunks.sort(key=lambda c: c["score"], reverse=True)
+        chunks = chunks[:rerank_top_n if rerank_top_n is not None else RERANK_TOP_N]
+
+    return chunks
+
+
 class SearchService:
 
-    # top_k/threshold/reranker_enabled are optional overrides (used by the RAG
-    # evaluation experiments to compare configurations); None falls back to
-    # the env-backed defaults, so normal callers are unaffected.
-    def execute(self, search, top_k=None, threshold=None, reranker_enabled=None):
+    # top_k/threshold/reranker_enabled/rerank_top_n/document_ids are optional
+    # overrides (used by the RAG evaluation experiments to compare
+    # configurations); None falls back to the env-backed defaults, so normal
+    # callers are unaffected. `query_embedding` skips the embedding call when
+    # the caller already has the vector (the evaluation caches them).
+    def execute(self, search, top_k=None, threshold=None, reranker_enabled=None, rerank_top_n=None,
+                document_ids=None, query_embedding=None):
 
-        self.embbed_search(search)
+        if query_embedding is not None:
+            search.search_embedding = query_embedding
+        else:
+            self.embbed_search(search)
 
         top_k_chunks = self.get_top_k_embeddings(
             search,
-            top_limit=top_k if top_k is not None else DEFAULT_TOP_K_RETRIEVE_SIZE,
+            top_limit=top_k,
             threshold=threshold,
             reranker_enabled=reranker_enabled,
+            rerank_top_n=rerank_top_n,
+            document_ids=document_ids,
         )
+        search.retrieved_chunks = [
+            {
+                "rank": rank,
+                "chunk_id": chunk["chunk_id"],
+                "document_name": chunk["document_name"],
+                "cosine_distance": chunk["cosine_distance"],
+                "score": chunk["score"],
+            }
+            for rank, chunk in enumerate(top_k_chunks, start=1)
+        ]
 
         return self.get_search_response(search, top_k_chunks)
     
@@ -55,51 +119,23 @@ class SearchService:
             search.save()
             raise
 
-    def get_top_k_embeddings(self, search, top_limit, threshold=None, reranker_enabled=None) -> list[SearchSchema]:
+    def get_top_k_embeddings(self, search, top_limit=None, threshold=None, reranker_enabled=None,
+                             rerank_top_n=None, document_ids=None) -> list[dict]:
         try:
-            distance_threshold = float(threshold) if threshold is not None else float(COSINE_DISTANCE_THRESHOLD)
-            use_reranker = reranker_enabled if reranker_enabled is not None else RERANKER_ENABLED
-
-            chunks_with_distance = DocumentChunkModel.objects.annotate(
-                distance=CosineDistance("embedding", search.search_embedding)
+            return retrieve_chunks(
+                search.text,
+                search.search_embedding,
+                top_k=top_limit,
+                threshold=threshold,
+                reranker_enabled=reranker_enabled,
+                rerank_top_n=rerank_top_n,
+                document_ids=document_ids,
             )
-            filter_chunks = chunks_with_distance.filter(distance__lte=distance_threshold).order_by("distance")[:top_limit]
-            top_k_chunks = [
-                {
-                    "document_name": chunk.document.file_name,
-                    "cosine_distance": chunk.distance,
-                    "chunk_text": chunk.text,
-                    "chunk_id": chunk.id,
-                    "score": 0,
-                }
-                for chunk in filter_chunks
-            ]
-
-            if use_reranker:
-                re_rank_top = self.re_rank_top_k(search, top_k_chunks)
-
-                for index, score in enumerate(re_rank_top, start=0):
-                    top_k_chunks[index]["score"] = score
-
-                top_k_chunks.sort(key=lambda x: x["score"], reverse=True)
-
-            return top_k_chunks
         except Exception as e:
             logger.exception("Failed to retrieve/re-rank the top-k chunks")
             search.error = f"Error: {e}"
             search.save()
             raise
-
-    def re_rank_top_k(self, search, top_k_chunks):
-        reranker = _get_reranker()
-
-        query = search.text
-
-        # Format as pairs of [query, passage]
-        sentence_pairs = [p["chunk_text"] for p in top_k_chunks]
-        # Compute relevance scores
-        results = reranker.rerank(query=query, documents=sentence_pairs)
-        return list(results)
 
     def get_search_response(self, search, top_k_chunks):
         try:

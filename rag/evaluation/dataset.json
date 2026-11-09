@@ -1,187 +1,202 @@
 [
-    {
-      "id": 1,
-      "category": "menu",
-      "query": "What vegetarian dishes are available?",
-      "difficulty": "easy",
-      "expected_topics": ["vegetarian dishes"],
-      "expected_answer": "The vegetarian dishes are mushroom pasta, vegetable curry, garden salad, and roasted tomato soup.",
-      "relevant_documents": ["restaurant_menu.pdf"],
-      "should_answer": true
-    },
-    {
-      "id": 2,
-      "category": "menu",
-      "query": "What are the main ingredients in the grilled chicken dish?",
-      "difficulty": "easy",
-      "expected_topics": ["grilled chicken", "ingredients"],
-      "expected_answer": "The grilled chicken bowl contains grilled chicken, roasted vegetables, rice, and herb sauce.",
-      "relevant_documents": ["restaurant_menu.pdf"],
-      "should_answer": true
-    },
-    {
-      "id": 5,
-      "category": "menu",
-      "query": "What is the most expensive main course?",
-      "difficulty": "medium",
-      "expected_topics": ["main courses", "prices"],
-      "expected_answer": "The grilled salmon is the most expensive main course at $21.",
-      "relevant_documents": ["restaurant_menu.pdf"],
-      "should_answer": true
-    },
-    {
-      "id": 6,
-      "category": "menu",
-      "query": "Which dishes are suitable for someone who does not eat meat?",
-      "difficulty": "medium",
-      "expected_topics": ["vegetarian dishes", "meat-free options"],
-      "expected_answer": "Suitable meat-free options include mushroom pasta, vegetable curry, garden salad, and roasted tomato soup.",
-      "relevant_documents": ["restaurant_menu.pdf"],
-      "should_answer": true
-    },
-    {
-      "id": 8,
-      "category": "menu",
-      "query": "Which dishes contain dairy products?",
-      "difficulty": "medium",
-      "expected_topics": ["dairy", "allergens"],
-      "expected_answer": "The mushroom pasta contains dairy in its standard preparation. Some dishes may be prepared without dairy upon request.",
-      "relevant_documents": ["allergen_guide.pdf", "restaurant_menu.pdf"],
-      "should_answer": true
-    },
-    {
-      "id": 10,
-      "category": "menu",
-      "query": "Can you recommend something light for lunch?",
-      "difficulty": "hard",
-      "expected_topics": ["light meals", "lunch"],
-      "expected_answer": "The garden salad or roasted tomato soup would be reasonable lighter options for lunch.",
-      "relevant_documents": ["restaurant_menu.pdf"],
-      "should_answer": true
-    },
-  
-    {
-      "id": 11,
-      "category": "hours",
-      "query": "What time does the restaurant open?",
-      "difficulty": "easy",
-      "expected_topics": ["opening hours"],
-      "expected_answer": "The restaurant opens at 11:30 AM from Tuesday through Sunday.",
-      "relevant_documents": ["restaurant_policies.pdf"],
-      "should_answer": true
-    },
-    {
-      "id": 12,
-      "category": "hours",
-      "query": "What time does the restaurant close on weekends?",
-      "difficulty": "easy",
-      "expected_topics": ["weekend hours", "closing time"],
-      "expected_answer": "The restaurant closes at 10:30 PM on Friday and Saturday, and at 8:00 PM on Sunday.",
-      "relevant_documents": ["restaurant_policies.pdf"],
-      "should_answer": true
-    },
-
-    {
-      "id": 16,
-      "category": "reservations",
-      "query": "Can I make a reservation for a large group?",
-      "difficulty": "medium",
-      "expected_topics": ["large groups", "reservations"],
-      "expected_answer": "Yes. Groups of eight or more can make reservations and should do so at least 24 hours in advance.",
-      "relevant_documents": ["restaurant_policies.pdf"],
-      "should_answer": true
-    },
-  
-    {
-      "id": 20,
-      "category": "policies",
-      "query": "Does the restaurant have a dress code?",
-      "difficulty": "easy",
-      "expected_topics": ["dress code"],
-      "expected_answer": "The restaurant's dress code is not specified in the current knowledge base.",
-      "relevant_documents": [],
-      "should_answer": false
-    },
-    {
-      "id": 22,
-      "category": "policies",
-      "query": "Does the restaurant offer outdoor seating?",
-      "difficulty": "easy",
-      "expected_topics": ["outdoor seating"],
-      "expected_answer": "Yes. The restaurant has an outdoor patio where dogs are welcome.",
-      "relevant_documents": ["restaurant_policies.pdf"],
-      "should_answer": true
-    },
-  
-    {
-      "id": 23,
-      "category": "payments",
-      "query": "What payment methods are accepted?",
-      "difficulty": "easy",
-      "expected_topics": ["payment methods"],
-      "expected_answer": "For online orders, the restaurant accepts Visa, Mastercard, American Express, and supported digital wallets. Pickup orders can also be paid with cash.",
-      "relevant_documents": ["delivery_and_orders.pdf"],
-      "should_answer": true
-    },
-  
-    {
-      "id": 25,
-      "category": "location",
-      "query": "Where is the restaurant located?",
-      "difficulty": "easy",
-      "expected_topics": ["address", "location"],
-      "expected_answer": "The restaurant's address is not specified in the current knowledge base.",
-      "relevant_documents": [],
-      "should_answer": false
-    },
-    {
-      "id": 26,
-      "category": "location",
-      "query": "Is parking available for customers?",
-      "difficulty": "easy",
-      "expected_topics": ["parking", "location"],
-      "expected_answer": "The current knowledge base does not specify whether customer parking is available.",
-      "relevant_documents": [],
-      "should_answer": false
-    },
-
-    {
-      "id": 28,
-      "category": "events",
-      "query": "What services are available for private events?",
-      "difficulty": "hard",
-      "expected_topics": ["private events", "event services"],
-      "expected_answer": "Private events can use a fixed three-course menu with vegetarian alternatives. The private room has Wi-Fi and a presentation screen, and the restaurant can arrange coffee, tea, and non-alcoholic beverages.",
-      "relevant_documents": ["events_private_dining.pdf"],
-      "should_answer": true
-    },
-  
-    {
-      "id": 29,
-      "category": "sustainability",
-      "query": "What sustainability practices does the restaurant follow?",
-      "difficulty": "hard",
-      "expected_topics": ["sustainability", "environmental practices"],
-      "expected_answer": "The current knowledge base does not contain enough information about the restaurant's sustainability practices.",
-      "relevant_documents": [],
-      "should_answer": false
-    },
-  
-    {
-      "id": 30,
-      "category": "multi-hop",
-      "query": "Can I bring my dog, sit outside, and order a vegetarian meal?",
-      "difficulty": "hard",
-      "expected_topics": [
-        "pets",
-        "outdoor seating",
-        "vegetarian dishes"
-      ],
-      "expected_answer": "Yes. Dogs are welcome on the outdoor patio, and vegetarian options include mushroom pasta, vegetable curry, garden salad, and roasted tomato soup. Guests should request a patio table when making the reservation.",
-      "relevant_documents": [
-        "restaurant_policies.pdf",
-        "restaurant_menu.pdf"
-      ],
-      "should_answer": true
-    }
-  ]
+  {
+    "id": 1,
+    "type": "single",
+    "category": "menu",
+    "query": "What vegetarian main courses are on the regular menu?",
+    "expected_answer": "The vegetarian main courses are the mushroom pasta, the vegetable curry and the garden burger.",
+    "relevant_documents": ["restaurant_menu.pdf"],
+    "distractor_documents": ["seasonal_winter_menu.pdf", "brunch_menu.pdf"],
+    "should_answer": true
+  },
+  {
+    "id": 2,
+    "type": "single",
+    "category": "delivery",
+    "query": "How far do you deliver and how much is the delivery fee?",
+    "expected_answer": "Delivery is made from Downtown within 8 kilometers. The delivery fee is $4 and delivery is free for orders over $40 (minimum order $15).",
+    "relevant_documents": ["delivery_and_orders.pdf", "restaurant_faq.pdf"],
+    "distractor_documents": ["catering.pdf"],
+    "should_answer": true
+  },
+  {
+    "id": 3,
+    "type": "single",
+    "category": "events",
+    "query": "How many people fit in the private dining room and what is the minimum spend on a Saturday?",
+    "expected_answer": "The Greenhouse Room seats up to 24 guests (35 standing). The minimum spend on Friday and Saturday is $600.",
+    "relevant_documents": ["events_private_dining.pdf"],
+    "distractor_documents": [],
+    "should_answer": true
+  },
+  {
+    "id": 4,
+    "type": "single",
+    "category": "loyalty",
+    "query": "How do I earn and redeem points in the loyalty program?",
+    "expected_answer": "Garden Club members earn 1 point per $1 spent (double points on Tuesdays for dine-in) and every 100 points can be exchanged for a $10 reward, one reward per bill.",
+    "relevant_documents": ["loyalty_promotions.pdf"],
+    "distractor_documents": [],
+    "should_answer": true
+  },
+  {
+    "id": 5,
+    "type": "single",
+    "category": "sustainability",
+    "query": "What does the restaurant do with food waste?",
+    "expected_answer": "Food scraps are composted through the city program, safe unsold food is donated nightly to Second Harvest Kitchen, and waste is measured weekly (down 22% per guest in 2025).",
+    "relevant_documents": ["sustainability_report.pdf"],
+    "distractor_documents": [],
+    "should_answer": true
+  },
+  {
+    "id": 6,
+    "type": "single",
+    "category": "accessibility",
+    "query": "Is the Downtown restaurant wheelchair accessible?",
+    "expected_answer": "Yes. There is a step-free entrance on the 3rd Avenue side, the dining room and patio are on the same level (with a ramp to the patio), and there is an accessible restroom on the ground floor.",
+    "relevant_documents": ["accessibility.pdf"],
+    "distractor_documents": ["riverside_location.pdf"],
+    "should_answer": true
+  },
+  {
+    "id": 7,
+    "type": "single",
+    "category": "brunch",
+    "query": "When is weekend brunch served?",
+    "expected_answer": "Brunch is served on Saturdays and Sundays from 10:00 AM to 2:00 PM, only at the Downtown location.",
+    "relevant_documents": ["brunch_menu.pdf", "restaurant_policies.pdf"],
+    "distractor_documents": ["policies_archive_2024.pdf"],
+    "should_answer": true
+  },
+  {
+    "id": 8,
+    "type": "single",
+    "category": "catering",
+    "query": "What is the minimum number of guests for catering and how much notice do you need?",
+    "expected_answer": "Catering requires at least 20 guests and 72 hours of notice (5 days for 75 guests or more).",
+    "relevant_documents": ["catering.pdf"],
+    "distractor_documents": ["events_private_dining.pdf"],
+    "should_answer": true
+  },
+  {
+    "id": 9,
+    "type": "multi_hop",
+    "category": "policies",
+    "query": "At the Downtown restaurant, can I bring my dog, sit outside and order a vegan main course?",
+    "expected_answer": "Yes. Leashed dogs are welcome on the Downtown patio (open April to October), and the vegetable curry is a vegan main course; the garden burger can also be made vegan on request.",
+    "relevant_documents": ["restaurant_policies.pdf", "restaurant_menu.pdf", "restaurant_faq.pdf"],
+    "distractor_documents": ["riverside_location.pdf", "policies_archive_2024.pdf"],
+    "should_answer": true
+  },
+  {
+    "id": 10,
+    "type": "multi_hop",
+    "category": "allergens",
+    "query": "Which desserts have no nuts in the recipe, and how much do they cost?",
+    "expected_answer": "The lemon cheesecake ($8), vanilla ice cream ($6) and seasonal fruit sorbet ($6) have no nuts in the recipe, although traces are possible because the pastry area handles almonds. The chocolate almond torte contains almonds.",
+    "relevant_documents": ["allergen_guide.pdf", "restaurant_menu.pdf"],
+    "distractor_documents": ["seasonal_winter_menu.pdf"],
+    "should_answer": true
+  },
+  {
+    "id": 11,
+    "type": "multi_hop",
+    "category": "events",
+    "query": "I want a seated company dinner for 30 people. Can I use the private dining room, or what are my options?",
+    "expected_answer": "The Greenhouse Room seats at most 24, so it is too small for 30 seated guests. Options are a full Downtown buyout (25 to 90 guests, minimum spend $3,000 Sunday-Thursday or $4,500 Friday-Saturday, booked two weeks ahead) or off-site catering (minimum 20 guests, 72 hours notice).",
+    "relevant_documents": ["events_private_dining.pdf", "catering.pdf"],
+    "distractor_documents": [],
+    "should_answer": true
+  },
+  {
+    "id": 12,
+    "type": "multi_hop",
+    "category": "payments",
+    "query": "Can I use a gift card to pay for a delivery order?",
+    "expected_answer": "Yes, if the order is placed on the restaurant's website. Gift cards cannot be used on third-party delivery apps.",
+    "relevant_documents": ["payments_and_gift_cards.pdf", "delivery_and_orders.pdf"],
+    "distractor_documents": [],
+    "should_answer": true
+  },
+  {
+    "id": 13,
+    "type": "multi_hop",
+    "category": "kids",
+    "query": "Can my kids order from the kids menu during weekend brunch, and what is included?",
+    "expected_answer": "Yes. The kids menu (children 12 and under) is available during all service hours, including weekend brunch at Downtown. Each kids meal includes a small drink and a scoop of ice cream or sorbet.",
+    "relevant_documents": ["kids_menu.pdf", "brunch_menu.pdf"],
+    "distractor_documents": [],
+    "should_answer": true
+  },
+  {
+    "id": 14,
+    "type": "conflict",
+    "category": "policies",
+    "query": "How much is the corkage fee if I bring my own wine?",
+    "expected_answer": "The corkage fee is $20 per 750 ml bottle, with a maximum of two bottles per table.",
+    "relevant_documents": ["restaurant_policies.pdf"],
+    "distractor_documents": ["policies_archive_2024.pdf"],
+    "should_answer": true
+  },
+  {
+    "id": 15,
+    "type": "conflict",
+    "category": "hours",
+    "query": "What time does the Downtown location close on Sundays?",
+    "expected_answer": "Downtown closes at 8:00 PM on Sundays.",
+    "relevant_documents": ["restaurant_policies.pdf"],
+    "distractor_documents": ["riverside_location.pdf", "policies_archive_2024.pdf"],
+    "should_answer": true
+  },
+  {
+    "id": 16,
+    "type": "conflict",
+    "category": "menu",
+    "query": "How much does the grilled salmon cost on the regular menu?",
+    "expected_answer": "The regular grilled salmon costs $21. (The winter edition, December to February, costs $24.)",
+    "relevant_documents": ["restaurant_menu.pdf"],
+    "distractor_documents": ["seasonal_winter_menu.pdf"],
+    "should_answer": true
+  },
+  {
+    "id": 17,
+    "type": "conflict",
+    "category": "policies",
+    "query": "Is there a fee to bring my own birthday cake?",
+    "expected_answer": "Yes. A cake fee of $3 per person is charged, covering plating, candles and serving.",
+    "relevant_documents": ["restaurant_policies.pdf", "restaurant_faq.pdf"],
+    "distractor_documents": ["policies_archive_2024.pdf"],
+    "should_answer": true
+  },
+  {
+    "id": 18,
+    "type": "unanswerable",
+    "category": "policies",
+    "query": "Is there a dress code for guests?",
+    "expected_answer": "The knowledge base does not specify a dress code for guests. (The staff handbook describes a uniform for employees only.)",
+    "relevant_documents": [],
+    "distractor_documents": ["staff_handbook_excerpt.pdf"],
+    "should_answer": false
+  },
+  {
+    "id": 19,
+    "type": "unanswerable",
+    "category": "events",
+    "query": "Do you have live music on weekends?",
+    "expected_answer": "The knowledge base does not mention live music.",
+    "relevant_documents": [],
+    "distractor_documents": [],
+    "should_answer": false
+  },
+  {
+    "id": 20,
+    "type": "unanswerable",
+    "category": "staff",
+    "query": "What is the name of the head chef?",
+    "expected_answer": "The knowledge base does not mention the head chef's name.",
+    "relevant_documents": [],
+    "distractor_documents": ["staff_handbook_excerpt.pdf"],
+    "should_answer": false
+  }
+]

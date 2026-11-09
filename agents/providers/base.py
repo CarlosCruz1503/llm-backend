@@ -69,3 +69,6 @@ class EmbeddingsProvider(Provider):
     
     def embed_content(self):
         pass
+
+    def embed_contents(self):
+        raise NotImplementedError(f"{type(self).__name__} does not support batched embeddings")

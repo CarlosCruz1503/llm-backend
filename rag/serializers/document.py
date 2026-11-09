@@ -36,5 +36,6 @@ class DocumentSerializer(BaseSerializer):
             chunk_model=chunk_config.get("model"),
             chunk_size=chunk_config.get("chunk_size"),
             chunk_overlap=chunk_config.get("chunk_overlap"),
+            contextual_headers=chunk_config.get("contextual_headers", False),
         )
         return document

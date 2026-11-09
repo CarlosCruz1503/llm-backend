@@ -2,8 +2,8 @@ from django.core.management.base import BaseCommand
 
 from restaurant.models import MenuCategory, MenuItem, Restaurant, RestaurantTable
 
-# Sourced from the sample knowledge base PDFs (restaurant_menu.pdf +
-# allergen_guide.pdf): "The Garden Table". Only what those two documents
+# Sourced from the evaluation knowledge base (rag/evaluation/data/kb_source/
+# restaurant_menu.md + allergen_guide.md): "The Garden Table". Only what those two documents
 # actually state is modeled here — no invented address/phone/email, and no
 # deeper "why"/policy content, since that belongs in the RAG pipeline as
 # embedded documents, not in these relational tables (see Restaurant's
@@ -15,27 +15,30 @@ MENU = [
     (
         "Starters",
         [
-            ("Roasted tomato soup", "7.00", "Served with toasted sourdough and basil oil. Vegetarian. Contains gluten (sourdough)."),
-            ("Crispy calamari", "11.00", "Served with lemon and garlic aioli. Contains shellfish."),
-            ("Garden salad", "8.00", "Mixed greens, cucumber, tomato, carrots, and house vinaigrette. Vegetarian."),
+            ("Roasted tomato soup", "7.00", "Slow-roasted tomatoes, basil oil and toasted sourdough. Vegetarian. Contains gluten (sourdough)."),
+            ("Garden salad", "8.00", "Mixed greens, cucumber, tomato, carrots and house vinaigrette. Vegan."),
+            ("Hummus plate", "9.00", "Chickpea hummus with tahini, pickled vegetables and flatbread. Vegan. Contains sesame and gluten."),
+            ("Crispy calamari", "11.00", "Lightly battered squid with lemon aioli. Contains shellfish, gluten and egg."),
         ],
     ),
     (
         "Main Courses",
         [
-            ("Grilled chicken bowl", "16.00", "Grilled chicken, roasted vegetables, rice, and herb sauce."),
-            ("Mushroom pasta", "15.00", "Pasta with wild mushrooms, parmesan, garlic, and cream sauce. Vegetarian. Contains dairy and gluten (pasta)."),
-            ("Grilled salmon", "21.00", "Salmon with roasted potatoes, seasonal vegetables, and lemon butter. Contains fish."),
-            ("Vegetable curry", "14.00", "Chickpeas, seasonal vegetables, coconut milk, and jasmine rice. Vegetarian."),
+            ("Mushroom pasta", "16.00", "Fresh tagliatelle, roasted mushrooms, parmesan and cream sauce. Vegetarian. Contains gluten, dairy and egg."),
+            ("Vegetable curry", "15.00", "Seasonal vegetables and chickpeas in coconut and tomato curry, with jasmine rice. Vegan, gluten-free."),
+            ("Garden burger", "15.00", "Black bean and beet patty, cheddar, herb mayo, brioche bun, fries. Vegetarian; vegan on request."),
+            ("Grilled chicken bowl", "17.00", "Grilled chicken, roasted vegetables, rice and herb sauce. Gluten-free."),
+            ("Grilled salmon", "21.00", "Salmon with lemon butter, crushed potatoes and green beans. Contains fish and dairy."),
+            ("Steak frites", "26.00", "Grass-fed sirloin, garlic butter, fries and watercress. Contains dairy."),
         ],
     ),
     (
         "Desserts",
         [
-            ("Chocolate cake", "8.00", ""),
-            ("Lemon cheesecake", "8.00", ""),
-            ("Seasonal fruit", "6.00", ""),
-            ("Vanilla ice cream", "5.00", ""),
+            ("Lemon cheesecake", "8.00", "Contains gluten, dairy and egg."),
+            ("Chocolate almond torte", "9.00", "Flourless. Contains tree nuts (almonds), egg and dairy."),
+            ("Vanilla ice cream", "6.00", "Contains dairy and egg."),
+            ("Seasonal fruit sorbet", "6.00", "Vegan, gluten-free."),
         ],
     ),
 ]

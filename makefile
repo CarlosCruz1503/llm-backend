@@ -37,14 +37,25 @@ test:
 lint:
 	docker exec -it core_ai_agent uv run ruff check .
 
-experiment_a:
-	docker exec -it core_ai_agent python manage.py shell -c "exec(open('rag/evaluation/scripts/experiment_A.py').read())"
+# RAG evaluation (see rag/evaluation/README.md). Retrieval is free; each
+# `eval_generate` run costs up to 20 LLM requests and resumes where it stopped.
+eval_kb:
+	uv run python rag/evaluation/scripts/build_kb.py
 
-experiment_b:
-	docker exec -it core_ai_agent python manage.py shell -c "exec(open('rag/evaluation/scripts/experiment_B.py').read())"
+eval_retrieval:
+	docker exec -it core_ai_agent python manage.py rag_eval retrieval
 
-experiment_c:
-	docker exec -it core_ai_agent python manage.py shell -c "exec(open('rag/evaluation/scripts/experiment_C.py').read())"
+# usage: make eval_generate EXP=small_chunks
+eval_generate:
+	docker exec -it core_ai_agent python manage.py rag_eval generate $(EXP)
+
+# usage: make eval_judge EXP=small_chunks
+eval_judge:
+	docker exec -it core_ai_agent python manage.py rag_eval judge $(EXP)
+
+eval_report:
+	docker exec -it core_ai_agent python manage.py rag_eval report
+
 # Wipes all DB data (drops the db-data volume) and brings everything back up
 # on a clean, empty database. Migration *files* are untouched — `web`'s own
 # entrypoint (/start) already runs `migrate` on boot, so the schema is

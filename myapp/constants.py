@@ -52,4 +52,8 @@ DEFAULT_EMBEDDING_DIMENTIONS = os.environ.get("DEFAULT_EMBEDDING_DIMENTIONS")
 
 DEFAULT_TOP_K_RETRIEVE_SIZE = 8
 
+# With the reranker enabled, top_k is the candidate pool pulled from pgvector
+# and only the best RERANK_TOP_N of those are sent to the LLM.
+RERANK_TOP_N = int(os.getenv("RERANK_TOP_N", "4"))
+
 RERANKER_MODEL = os.getenv("RERANKER_MODEL", "jinaai/jina-reranker-v2-base-multilingual")

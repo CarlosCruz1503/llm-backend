@@ -71,6 +71,10 @@ Three Django apps, each independently useful and homologated to the same interna
 
 **The reranker model loads once per worker process, not once per request.** It's a lazily-initialized, `functools.lru_cache`-memoized singleton (`rag/services/search.py`) — not built eagerly in `AppConfig.ready()`, since that would pay the load cost in every process that imports the app (migrations, unrelated management commands, other Celery workers), not just the ones that actually serve search.
 
+**The reranker narrows the context, it doesn't just reorder it.** With `RERANKER_ENABLED`, `top_k` is the candidate pool pulled from pgvector; the cross-encoder scores it and only the best `RERANK_TOP_N` chunks reach the LLM. Reordering without cutting would send exactly the same tokens to the LLM, which the first evaluation run showed (see below).
+
+**Every search records what retrieval actually returned.** `SearchModel.retrieved_chunks` stores the ranked chunk ids, documents, distances and rerank scores straight from retrieval. `chunk_list` is the LLM's own account of which chunks it used; keeping both separates retrieval failures from generation failures.
+
 **Errors are recorded on the record, not swallowed into a broken response.** Serializers used to catch exceptions and return a bare `{"Error": ...}` dict from `create()` — which DRF can't actually serialize (a `ModelSerializer` expects a model instance), turning every failure into an opaque 500. Serializers now return the (partially-updated, error-carrying) model instance instead, so failures are visible in the response body with the right shape.
 
 ## The RAG pipeline
@@ -138,10 +142,10 @@ sequenceDiagram
     API->>SS: execute(search)
     SS->>LLM: embed(query)
     SS->>PG: cosine distance <= threshold, order by distance, top-k
-    SS->>RR: rerank(query, chunk texts)
-    SS->>LLM: answer(query, top-k chunks)
+    SS->>RR: rerank(query, candidate texts), keep RERANK_TOP_N (if enabled)
+    SS->>LLM: answer(query, selected chunks)
     LLM-->>SS: structured, schema-validated response
-    SS-->>API: SearchModel (response, chunk_list, tokens...)
+    SS-->>API: SearchModel (response, retrieved_chunks, chunk_list, tokens...)
     API-->>C: 201 Created — the answer, in this same request
 ```
 
@@ -149,13 +153,14 @@ No polling, no task id to check later — the tradeoff is that a slow provider c
 
 ## Evaluating RAG configurations
 
-Wiring up chunking/retrieval/reranking is the easy part; knowing whether a given chunk size, top-k, distance threshold, or reranker setting actually retrieves the right document is a separate, empirical question. `rag/evaluation/` (`EvaluationService`, `rag/services/evaluation.py`) is a small experiment harness built to answer that for this project specifically:
+Wiring up chunking, retrieval and reranking is the easy part. Knowing which chunk size, top-k, threshold or reranker setting works is an empirical question, so `rag/evaluation/` has a harness for it (`python manage.py rag_eval`, logic in `rag/services/evaluation.py`):
 
-- A fictional restaurant's knowledge base (menu, hours/policies, dietary info, etc. — nine PDFs, `rag/evaluation/data/testset_files/`) is embedded through the normal async ingestion pipeline, with the experiment's chunk size/overlap/token model passed explicitly as task args (not global state), so multiple experiments can't leak config into each other.
-- A fixed set of questions (`rag/evaluation/dataset.json`) is run against each configuration, scoring both **retrieval recall** (was the right document among the top-k retrieved, regardless of which chunk the LLM cited) and **answer correctness** (a manual grading pass on top of the automatic per-question match check — matching the right source document doesn't guarantee the generated answer is actually good).
-- Three configurations (`rag/evaluation/scripts/experiment_{A,B,C}.py`) — small/no-rerank, medium/no-rerank, medium/reranked — are compared side by side in `rag/evaluation/results/`.
+- **Knowledge base:** 20 synthetic documents about a fictional restaurant (~8k tokens), written in Markdown (`rag/evaluation/data/kb_source/`) and rendered to PDF. It contains deliberate traps: a second location with different hours, an archived 2024 policy, a winter menu with different prices, and a staff-only dress code.
+- **Dataset:** 20 questions, each labelled with the documents that answer it and the distractors that shouldn't: single-document, multi-hop, conflicting-information and unanswerable.
+- **Stage 1, retrieval sweep:** 24 configurations, one variable at a time. Query vectors are embedded once and cached, so the sweep makes no LLM calls. Measures hit rate, recall, MRR, distractor rate and context tokens from the real retrieval results.
+- **Stage 2, generation:** a few finalists answer the dataset through the real `/api/search/` path, and an LLM judge grades all answers in one request. Runs are resumable, so they fit a 20-requests-per-day free tier.
 
-See `rag/evaluation/README.md` for the full write-up and how to reproduce a run.
+The first version of this harness (`results/v1_pilot/`) produced a confident-looking winner that turned out to be a measurement artifact; [its write-up](rag/evaluation/results/v1_pilot/README.md) explains what was wrong. **The full write-up (findings, why small chunks win, why overlap doesn't carry document context, and the engineering problems found) is in [`docs/rag-evaluation-notes.md`](docs/rag-evaluation-notes.md).** Current tables are in `rag/evaluation/results/REPORT.md`; how to reproduce a run is in [`rag/evaluation/README.md`](rag/evaluation/README.md).
 
 ## Provider abstraction
 
@@ -268,7 +273,10 @@ See `makefile` for the rest of the targets (`logs`, `bash`, `migrations`, `resta
 | `OPENROUTER_API_KEY`, `OPENROUTER_MODEL`, `OPENROUTER_EMBEDDING_MODEL` | OpenRouter provider |
 | `DEFAULT_EMBEDDING_DIMENTIONS` | Vector size for pgvector columns — must match the embedding model in use |
 | `COSINE_DISTANCE_THRESHOLD` | Max cosine distance for a chunk to be considered a search candidate |
+| `RERANKER_ENABLED` | `True` to rerank search candidates with the cross-encoder |
+| `RERANK_TOP_N` | With the reranker on, how many of the `top_k` candidates reach the LLM (default 4) |
 | `RERANKER_MODEL` | fastembed cross-encoder model name (defaults to `jinaai/jina-reranker-v2-base-multilingual`) |
+| `EVAL_JUDGE_MODEL` | Optional model for the RAG evaluation judge (defaults to `GEMINI_AI_MODEL`) |
 | `CELERY_BROKER`, `CELERY_BACKEND` | Redis URLs for the Celery broker/result backend |
 | `CELERY_TIMEZONE`, `CELERY_TASK_TRACK_STARTED`, `CELERY_TASK_TIME_LIMIT` | Celery runtime config |
 

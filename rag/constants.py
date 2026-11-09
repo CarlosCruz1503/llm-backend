@@ -20,3 +20,6 @@ class DocumentStatusChoices(models.TextChoices):
 DEFAULT_DOCUMENT_STATUS = DocumentStatusChoices.PENDING
 
 RERANKER_ENABLED = (os.environ.get("RERANKER_ENABLED")  == "True")
+# Model for the RAG evaluation judge. Free-tier quotas are per model, so a
+# different model than GEMINI_AI_MODEL keeps judging off the answer quota.
+EVAL_JUDGE_MODEL = os.environ.get("EVAL_JUDGE_MODEL") or None

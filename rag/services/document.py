@@ -39,7 +39,7 @@ class DocumentService:
 
 class ChunkService:
 
-    def process_chunks(self, document_id, model=None, chunk_size=None, chunk_overlap=None):
+    def process_chunks(self, document_id, model=None, chunk_size=None, chunk_overlap=None, contextual_headers=False):
         try:
             document = DocumentModel.objects.get(pk=document_id)
             document.status = DocumentStatusChoices.CHUNKING
@@ -53,6 +53,7 @@ class ChunkService:
                 model=model if model is not None else DEFAULT_TOKEN_MODEL,
                 chunk_size=chunk_size if chunk_size is not None else MAX_TOKENS_FOR_CHUNK,
                 chunk_overlap=chunk_overlap if chunk_overlap is not None else DEFAULT_OVERLAP_TOKENS_FOR_CHUNK,
+                contextual_headers=contextual_headers,
             )
 
             document.status = DocumentStatusChoices.EMBEDDING

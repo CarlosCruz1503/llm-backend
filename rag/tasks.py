@@ -19,7 +19,8 @@ def add(x, y):
 @shared_task(bind=True,
              max_retries=3,
              retry_backoff=4)
-def task_process_document(self, document_id: int, chunk_model=None, chunk_size=None, chunk_overlap=None) -> int:
+def task_process_document(self, document_id: int, chunk_model=None, chunk_size=None, chunk_overlap=None,
+                          contextual_headers=False) -> int:
     # Returns the document's id rather than the DocumentModel instance
     # itself: Celery stores every task's return value in the result backend
     # via JSON, and a Django model instance isn't JSON-serializable (it
@@ -36,7 +37,8 @@ def task_process_document(self, document_id: int, chunk_model=None, chunk_size=N
         document = document_service.process_document(document_id)
         if document.text_extracted:
             task_create_and_process_chunks.delay(
-                document.id, chunk_model=chunk_model, chunk_size=chunk_size, chunk_overlap=chunk_overlap
+                document.id, chunk_model=chunk_model, chunk_size=chunk_size, chunk_overlap=chunk_overlap,
+                contextual_headers=contextual_headers,
             )
         return document.id
     except Exception as exc:
@@ -54,10 +56,14 @@ def task_process_document(self, document_id: int, chunk_model=None, chunk_size=N
 @shared_task(bind=True,
              max_retries=3,
              retry_backoff=4)
-def task_create_and_process_chunks(self, document_id: int, chunk_model=None, chunk_size=None, chunk_overlap=None) -> None:
+def task_create_and_process_chunks(self, document_id: int, chunk_model=None, chunk_size=None, chunk_overlap=None,
+                                   contextual_headers=False) -> None:
     chunk_service = ChunkService()
     try:
-        chunks = chunk_service.process_chunks(document_id, model=chunk_model, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+        chunks = chunk_service.process_chunks(
+            document_id, model=chunk_model, chunk_size=chunk_size, chunk_overlap=chunk_overlap,
+            contextual_headers=contextual_headers,
+        )
         # `chord` fires task_finalize_document once every task_process_chunk
         # in the group has finished, whether they succeeded or not — that's
         # the only reliable signal that embedding generation is actually
@@ -84,7 +90,7 @@ def task_create_and_process_chunks(self, document_id: int, chunk_model=None, chu
 def task_process_chunk(self, chunk_id: int, document_id: int) -> bool:
     try:
         chunk = DocumentChunkModel.objects.get(pk=chunk_id)
-        client = create_client_for_embedding(chunk.provider, chunk.text)
+        client = create_client_for_embedding(chunk.provider, chunk.contextual_text)
         response = client.embed_content()
         chunk.embedding = response
         chunk.save(update_fields=["embedding"])
