@@ -9,6 +9,7 @@ Split in two stages so it fits a free-tier quota:
    the real search pipeline (one LLM request per question). Runs are
    resumable, and a single judge request grades all answers afterwards.
 """
+import fcntl
 import hashlib
 import json
 import logging
@@ -346,6 +347,18 @@ def run_retrieval_sweep(configs=RETRIEVAL_SWEEP, provider=ProviderChoices.GEMINI
 # --- generation ----------------------------------------------------------------------------------
 
 def run_generation(name, max_requests=20, sleep_seconds=15, provider=ProviderChoices.GEMINI) -> tuple[dict, int]:
+    # Two concurrent runs of one experiment would answer the same questions twice
+    # and spend the daily quota on duplicates.
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    with open(CACHE_DIR / f"generate_{name}.lock", "w") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            raise RuntimeError(f"Another `generate {name}` run is already in progress.") from None
+        return _run_generation(name, max_requests, sleep_seconds, provider)
+
+
+def _run_generation(name, max_requests, sleep_seconds, provider) -> tuple[dict, int]:
     """Answer the dataset with one finalist configuration, resuming previous runs.
 
     Every answer is written to disk as soon as it arrives. A failed request

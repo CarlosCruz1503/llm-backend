@@ -114,7 +114,9 @@ def task_process_chunk(self, chunk_id: int, document_id: int) -> bool:
             return False
 
         # Re-raise the retry
-        raise self.retry(exc=exc, countdown=10)
+        # Rate limits (429) are per minute: retrying after 10s just fails again.
+        countdown = 60 if "RESOURCE_EXHAUSTED" in str(exc) or "429" in str(exc) else 10
+        raise self.retry(exc=exc, countdown=countdown)
 
 
 @shared_task

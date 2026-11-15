@@ -9,7 +9,7 @@ from google.genai import types
 
 
 from agents.constants import AGENT_RESTAURANT_DEFAULT_INPUT
-from myapp.constants import DEFAULT_EMBEDDING_DIMENTIONS, GEMINI_EMBEDDING_MODEL, GEMINI_MODEL, SYSTEM_INSTRUCTION_FOR_CHAT
+from myapp.constants import DEFAULT_EMBEDDING_DIMENTIONS, GEMINI_EMBEDDING_MODEL, GEMINI_MODEL
 from ..base import ChatProvider, EmbeddingsProvider
 
 logger = logging.getLogger(__name__)

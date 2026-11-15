@@ -85,9 +85,12 @@ GENERATION_EXPERIMENTS = {
         RetrievalConfig("small_chunks", "chunk128", top_k=3),
         # Same recall at ~3x the tokens; whole documents keep headers such as "ARCHIVED".
         RetrievalConfig("whole_docs", "chunk512", top_k=3),
-        # small_chunks, but unanswerable questions should get no context at all.
-        RetrievalConfig("small_chunks_threshold", "chunk128", top_k=3, threshold=0.28),
-        # small_chunks where every chunk names its document and section (e.g. "... 2024 (ARCHIVED)").
-        RetrievalConfig("small_chunks_ctx", "chunk128_ctx", top_k=3),
+        # small_chunks, but unanswerable questions should get no context at all. 0.29 keeps
+        # every unanswerable question at 0 chunks and loses only Q15 (0.28 also cut Q2, Q10).
+        RetrievalConfig("small_chunks_threshold", "chunk128", top_k=3, threshold=0.29),
+        # Best retrieval in the sweep (100% hit, 98% recall, MRR 0.97): 256-token chunks that name
+        # their document and section (e.g. "... 2024 (ARCHIVED)"). On 128-token chunks the header
+        # crowded out second documents, so the 256 variant is the finalist.
+        RetrievalConfig("medium_chunks_ctx", "chunk256_ctx", top_k=3),
     ]
 }

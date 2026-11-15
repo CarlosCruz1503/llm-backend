@@ -65,7 +65,7 @@ make eval_retrieval                 # python manage.py rag_eval retrieval
 # Look at results/REPORT.md, then set the finalists in experiments.py
 
 # Day 2+: one finalist per day (20 requests):
-# small_chunks, whole_docs, small_chunks_threshold, small_chunks_ctx
+# small_chunks, whole_docs, small_chunks_threshold, medium_chunks_ctx
 make eval_generate EXP=small_chunks     # rerun to resume if it stops early
 make eval_judge EXP=small_chunks        # 1 request; set EVAL_JUDGE_MODEL to use another model's quota
 

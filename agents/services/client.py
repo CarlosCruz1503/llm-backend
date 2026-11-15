@@ -6,7 +6,6 @@ from agents.tools.registry import ToolsRegistry
 from agents.tools.share_menu import ShareMenuTool
 from chat.models.message import Message
 from agents.schemas.tools import ToolResponse
-from prompting.schemas.message import messageOutputModel
 from rag.schemas.search import ResultSearchSchema
 
 from prompting.factory.output import promptsFactory

@@ -5,6 +5,7 @@ import tiktoken
 from chonkie import TokenChunker
 from rag.models.document import DocumentModel
 from rag.models.document_chunk import DocumentChunkModel
+from rag.services.pdf import extract_lines
 
 logger = logging.getLogger(__name__)
 
@@ -34,10 +35,9 @@ def _is_heading(line: str) -> bool:
     return bool(_HEADING.match(line)) and not line.endswith((".", ",", ":", ";"))
 
 
-def document_title(text: str) -> str:
+def document_title(lines: list[str]) -> str:
     """First line of the document, joined with the next one when a long title
     wrapped (the first line then ends with a connector such as "and")."""
-    lines = [line.strip() for line in text.splitlines() if line.strip()]
     if not lines:
         return ""
     title = lines[0]
@@ -46,8 +46,13 @@ def document_title(text: str) -> str:
     return title
 
 
-def build_chunk_headers(text: str, chunks: list) -> list[str]:
+def build_chunk_headers(text: str, lines: list[str], chunks: list) -> list[str]:
     """A "Document: <title> / Section: <heading>" header for every chunk.
+
+    `text` is the stored document text (whitespace-flattened, so it has no line
+    structure); `lines` are the PDF's layout lines, used to find the title and
+    the section headings. Each heading is then located in `text`, in order, to
+    know which section every chunk starts in.
 
     The section is the heading in effect where the chunk starts, which is the
     context the chunk text itself is missing (a heading inside the chunk is
@@ -55,18 +60,19 @@ def build_chunk_headers(text: str, chunks: list) -> list[str]:
     chunk from the middle of a document still say which document, and which
     status (e.g. ARCHIVED), it belongs to.
     """
-    title = document_title(text)
-    first_line = next((line.strip() for line in text.splitlines() if line.strip()), "")
-    title_lines = 1 if title == first_line else 2
-    headings = []  # (character offset, heading)
-    offset, seen_lines = 0, 0
-    for line in text.splitlines(keepends=True):
-        stripped = line.strip()
-        if stripped:
-            seen_lines += 1
-            if seen_lines > title_lines and _is_heading(stripped):
-                headings.append((offset, stripped))
-        offset += len(line)
+    title = document_title(lines)
+    title_lines = 1 if not lines or title == lines[0] else 2
+
+    headings = []  # (character offset in `text`, heading)
+    cursor = text.find(title) + len(title) if title in text else 0
+    for line in lines[title_lines:]:
+        if not _is_heading(line):
+            continue
+        offset = text.find(line, cursor)
+        if offset == -1:
+            continue
+        headings.append((offset, line))
+        cursor = offset + len(line)
 
     headers = []
     for chunk in chunks:
@@ -91,7 +97,10 @@ def create_and_save_chunks(document: DocumentModel, model, chunk_size, chunk_ove
 
     chunks = generate_chunks(document.text_content, model, chunk_size, chunk_overlap )
     # Stored apart from `text`; task_process_chunk embeds `contextual_text` (header + text).
-    headers = build_chunk_headers(document.text_content, chunks) if contextual_headers else [None] * len(chunks)
+    if contextual_headers:
+        headers = build_chunk_headers(document.text_content, extract_lines(document.file), chunks)
+    else:
+        headers = [None] * len(chunks)
     chunks_created =[]
     for index, (chunk, header) in enumerate(zip(chunks, headers), start=1):
         chunks_created.append(DocumentChunkModel.objects.create(

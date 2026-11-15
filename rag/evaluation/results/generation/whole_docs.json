@@ -1,0 +1,1152 @@
+{
+  "experiment": {
+    "name": "whole_docs",
+    "corpus": "chunk512",
+    "top_k": 3,
+    "threshold": null,
+    "reranker": false,
+    "rerank_top_n": null
+  },
+  "provider": "gemini",
+  "model": "gemini-3.6-flash",
+  "started_at": "2026-11-09T03:17:09+00:00",
+  "results": {
+    "1": {
+      "id": 1,
+      "type": "single",
+      "query": "What vegetarian main courses are on the regular menu?",
+      "expected_answer": "The vegetarian main courses are the mushroom pasta, the vegetable curry and the garden burger.",
+      "should_answer": true,
+      "answer": "The vegetarian main courses on the regular menu are the Mushroom pasta, the Vegetable curry, and the Garden burger.",
+      "retrieval": {
+        "documents": [
+          "restaurant_menu.pdf",
+          "seasonal_winter_menu.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1084,
+        "top_distance": 0.23049552146765373,
+        "distractor_retrieved": true,
+        "hit": true,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 134,
+          "document_name": "restaurant_menu.pdf",
+          "cosine_distance": 0.23049552146765373,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 137,
+          "document_name": "restaurant_menu.pdf",
+          "cosine_distance": 0.233373684707036,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 139,
+          "document_name": "seasonal_winter_menu.pdf",
+          "cosine_distance": 0.27353274901446367,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "134",
+      "input_tokens": 1273,
+      "output_tokens": 688,
+      "total_tokens": 1961,
+      "latency_s": 4.66,
+      "judge": {
+        "score": 5,
+        "verdict": "correct",
+        "reason": "Accurately lists all vegetarian main courses from the regular menu.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "2": {
+      "id": 2,
+      "type": "single",
+      "query": "How far do you deliver and how much is the delivery fee?",
+      "expected_answer": "Delivery is made from Downtown within 8 kilometers. The delivery fee is $4 and delivery is free for orders over $40 (minimum order $15).",
+      "should_answer": true,
+      "answer": "Regular delivery is available within 8 kilometers of the Downtown location. The delivery fee is $4, and delivery is free for orders over $40 (with a minimum order of $15). For catering orders (20 or more people), delivery is available within 15 kilometers of the Downtown restaurant with a $40 delivery fee, which is waived for orders over $600.",
+      "retrieval": {
+        "documents": [
+          "delivery_and_orders.pdf",
+          "catering.pdf",
+          "restaurant_faq.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1099,
+        "top_distance": 0.2797357510890316,
+        "distractor_retrieved": true,
+        "hit": true,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 125,
+          "document_name": "delivery_and_orders.pdf",
+          "cosine_distance": 0.2797357510890316,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 126,
+          "document_name": "catering.pdf",
+          "cosine_distance": 0.3113726836092926,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 136,
+          "document_name": "restaurant_faq.pdf",
+          "cosine_distance": 0.3262675197443198,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "125",
+      "input_tokens": 1372,
+      "output_tokens": 642,
+      "total_tokens": 2014,
+      "latency_s": 4.93,
+      "judge": {
+        "score": 5,
+        "verdict": "correct",
+        "reason": "Completely covers delivery radius, fee, free delivery threshold, and additional catering delivery details.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "3": {
+      "id": 3,
+      "type": "single",
+      "query": "How many people fit in the private dining room and what is the minimum spend on a Saturday?",
+      "expected_answer": "The Greenhouse Room seats up to 24 guests (35 standing). The minimum spend on Friday and Saturday is $600.",
+      "should_answer": true,
+      "answer": "The private dining room (The Greenhouse Room) can accommodate up to 24 guests seated or up to 35 guests for a standing reception. The minimum spend on a Saturday is $600.",
+      "retrieval": {
+        "documents": [
+          "events_private_dining.pdf",
+          "restaurant_policies.pdf",
+          "restaurant_faq.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1145,
+        "top_distance": 0.2047863027988065,
+        "distractor_retrieved": null,
+        "hit": true,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 129,
+          "document_name": "events_private_dining.pdf",
+          "cosine_distance": 0.2047863027988065,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 138,
+          "document_name": "restaurant_policies.pdf",
+          "cosine_distance": 0.3000596970300312,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 136,
+          "document_name": "restaurant_faq.pdf",
+          "cosine_distance": 0.3056754395686748,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "129",
+      "input_tokens": 1451,
+      "output_tokens": 545,
+      "total_tokens": 1996,
+      "latency_s": 4.06,
+      "judge": {
+        "score": 5,
+        "verdict": "correct",
+        "reason": "Correctly states room capacities and Saturday minimum spend.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "4": {
+      "id": 4,
+      "type": "single",
+      "query": "How do I earn and redeem points in the loyalty program?",
+      "expected_answer": "Garden Club members earn 1 point per $1 spent (double points on Tuesdays for dine-in) and every 100 points can be exchanged for a $10 reward, one reward per bill.",
+      "should_answer": true,
+      "answer": "To earn points in The Garden Club loyalty program, members earn 1 point for every $1 spent (before tax and service charge) on dine-in bills at both locations and on delivery or pickup orders placed on the website. Members earn double points on dine-in bills on Tuesdays. Points are not earned on third-party delivery apps, gift card purchases, or catering orders. To redeem points, every 100 points can be exchanged for a $10 reward. Rewards can be used at both locations and on website orders (but not on third-party apps), with a limit of one reward per bill. Points expire after 12 months of inactivity.",
+      "retrieval": {
+        "documents": [
+          "loyalty_promotions.pdf",
+          "payments_and_gift_cards.pdf",
+          "restaurant_faq.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1034,
+        "top_distance": 0.25507227225581397,
+        "distractor_retrieved": null,
+        "hit": true,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 132,
+          "document_name": "loyalty_promotions.pdf",
+          "cosine_distance": 0.25507227225581397,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 133,
+          "document_name": "payments_and_gift_cards.pdf",
+          "cosine_distance": 0.36622359257269865,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 136,
+          "document_name": "restaurant_faq.pdf",
+          "cosine_distance": 0.3809471314863201,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "132",
+      "input_tokens": 1316,
+      "output_tokens": 685,
+      "total_tokens": 2001,
+      "latency_s": 3.97,
+      "judge": {
+        "score": 5,
+        "verdict": "correct",
+        "reason": "Provides precise details on point earning, bonus days, and redemption rules.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "5": {
+      "id": 5,
+      "type": "single",
+      "query": "What does the restaurant do with food waste?",
+      "expected_answer": "Food scraps are composted through the city program, safe unsold food is donated nightly to Second Harvest Kitchen, and waste is measured weekly (down 22% per guest in 2025).",
+      "should_answer": true,
+      "answer": "Regarding food waste, The Garden Table composts all kitchen food scraps through the city composting program, donates unsold food that is safe to eat every night to Second Harvest Kitchen, and measures food waste on a weekly basis.",
+      "retrieval": {
+        "documents": [
+          "sustainability_report.pdf",
+          "staff_handbook_excerpt.pdf",
+          "restaurant_faq.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1032,
+        "top_distance": 0.23964393729620492,
+        "distractor_retrieved": null,
+        "hit": true,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 142,
+          "document_name": "sustainability_report.pdf",
+          "cosine_distance": 0.23964393729620492,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 141,
+          "document_name": "staff_handbook_excerpt.pdf",
+          "cosine_distance": 0.3153684107127328,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 136,
+          "document_name": "restaurant_faq.pdf",
+          "cosine_distance": 0.3175272373806398,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "142",
+      "input_tokens": 1320,
+      "output_tokens": 998,
+      "total_tokens": 2318,
+      "latency_s": 5.23,
+      "judge": {
+        "score": 5,
+        "verdict": "correct",
+        "reason": "Accurately describes composting, food donation, and waste tracking practices.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "6": {
+      "id": 6,
+      "type": "single",
+      "query": "Is the Downtown restaurant wheelchair accessible?",
+      "expected_answer": "Yes. There is a step-free entrance on the 3rd Avenue side, the dining room and patio are on the same level (with a ramp to the patio), and there is an accessible restroom on the ground floor.",
+      "should_answer": true,
+      "answer": "Yes, The Garden Table Downtown location is wheelchair accessible. It features a step-free entrance on the 3rd Avenue side (next to the patio gate), step-free access to the indoor dining room and outdoor patio (connected by a short ramp), a ground-floor accessible restroom with grab bars, a step-free private dining room, and tables that can be rearranged or removed to accommodate wheelchairs. Note that the main Alder Street entrance has two steps.",
+      "retrieval": {
+        "documents": [
+          "accessibility.pdf",
+          "riverside_location.pdf",
+          "location_and_parking.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1045,
+        "top_distance": 0.22857968636871018,
+        "distractor_retrieved": true,
+        "hit": true,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 121,
+          "document_name": "accessibility.pdf",
+          "cosine_distance": 0.22857968636871018,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 135,
+          "document_name": "riverside_location.pdf",
+          "cosine_distance": 0.2675296185857414,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 131,
+          "document_name": "location_and_parking.pdf",
+          "cosine_distance": 0.2744478098225307,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "121",
+      "input_tokens": 1303,
+      "output_tokens": 544,
+      "total_tokens": 1847,
+      "latency_s": 3.74,
+      "judge": {
+        "score": 5,
+        "verdict": "correct",
+        "reason": "Provides a thorough and accurate summary of accessibility features.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "7": {
+      "id": 7,
+      "type": "single",
+      "query": "When is weekend brunch served?",
+      "expected_answer": "Brunch is served on Saturdays and Sundays from 10:00 AM to 2:00 PM, only at the Downtown location.",
+      "should_answer": true,
+      "answer": "Weekend brunch is served on Saturdays and Sundays from 10:00 AM to 2:00 PM at the Downtown location only.",
+      "retrieval": {
+        "documents": [
+          "brunch_menu.pdf",
+          "restaurant_faq.pdf",
+          "restaurant_policies.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1181,
+        "top_distance": 0.2119979767792538,
+        "distractor_retrieved": false,
+        "hit": true,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 122,
+          "document_name": "brunch_menu.pdf",
+          "cosine_distance": 0.2119979767792538,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 136,
+          "document_name": "restaurant_faq.pdf",
+          "cosine_distance": 0.31742169933863407,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 138,
+          "document_name": "restaurant_policies.pdf",
+          "cosine_distance": 0.32850108832055547,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "122",
+      "input_tokens": 1452,
+      "output_tokens": 837,
+      "total_tokens": 2289,
+      "latency_s": 5.01,
+      "judge": {
+        "score": 5,
+        "verdict": "correct",
+        "reason": "Correctly identifies brunch days, hours, and location.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "8": {
+      "id": 8,
+      "type": "single",
+      "query": "What is the minimum number of guests for catering and how much notice do you need?",
+      "expected_answer": "Catering requires at least 20 guests and 72 hours of notice (5 days for 75 guests or more).",
+      "should_answer": true,
+      "answer": "The minimum order for catering is 20 guests. Orders must be placed at least 72 hours in advance, while orders for 75 guests or more require at least 5 days of notice.",
+      "retrieval": {
+        "documents": [
+          "catering.pdf",
+          "events_private_dining.pdf",
+          "restaurant_faq.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1115,
+        "top_distance": 0.21647664196745686,
+        "distractor_retrieved": true,
+        "hit": true,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 126,
+          "document_name": "catering.pdf",
+          "cosine_distance": 0.21647664196745686,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 129,
+          "document_name": "events_private_dining.pdf",
+          "cosine_distance": 0.2870197939043533,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 136,
+          "document_name": "restaurant_faq.pdf",
+          "cosine_distance": 0.3100556299173032,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "126",
+      "input_tokens": 1396,
+      "output_tokens": 402,
+      "total_tokens": 1798,
+      "latency_s": 3.76,
+      "judge": {
+        "score": 5,
+        "verdict": "correct",
+        "reason": "Accurately states minimum guest count and advance notice requirements.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "9": {
+      "id": 9,
+      "type": "multi_hop",
+      "query": "At the Downtown restaurant, can I bring my dog, sit outside and order a vegan main course?",
+      "expected_answer": "Yes. Leashed dogs are welcome on the Downtown patio (open April to October), and the vegetable curry is a vegan main course; the garden burger can also be made vegan on request.",
+      "should_answer": true,
+      "answer": "Yes, at the Downtown location you can bring your dog, sit outside, and order a vegan main course. Dogs are welcome on the outdoor patio (which has 40 seats and is open from April to October, weather permitting), provided they are kept on a leash. For vegan main courses, they offer options such as the vegetable curry or the garden burger (which can be made vegan upon request).",
+      "retrieval": {
+        "documents": [
+          "restaurant_faq.pdf",
+          "restaurant_policies.pdf",
+          "riverside_location.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1124,
+        "top_distance": 0.24911798510484873,
+        "distractor_retrieved": true,
+        "hit": true,
+        "recall": 0.6667,
+        "reciprocal_rank": 1.0
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 136,
+          "document_name": "restaurant_faq.pdf",
+          "cosine_distance": 0.24911798510484873,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 138,
+          "document_name": "restaurant_policies.pdf",
+          "cosine_distance": 0.2556779980657581,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 135,
+          "document_name": "riverside_location.pdf",
+          "cosine_distance": 0.2835194806478516,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "136",
+      "input_tokens": 1434,
+      "output_tokens": 895,
+      "total_tokens": 2329,
+      "latency_s": 5.38,
+      "judge": {
+        "score": 5,
+        "verdict": "correct",
+        "reason": "Correctly answers all parts of the three-part question.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "10": {
+      "id": 10,
+      "type": "multi_hop",
+      "query": "Which desserts have no nuts in the recipe, and how much do they cost?",
+      "expected_answer": "The lemon cheesecake ($8), vanilla ice cream ($6) and seasonal fruit sorbet ($6) have no nuts in the recipe, although traces are possible because the pastry area handles almonds. The chocolate almond torte contains almonds.",
+      "should_answer": true,
+      "answer": "The desserts that have no nuts in their recipe are:\n- Lemon cheesecake: $8\n- Vanilla ice cream: $6\n- Seasonal fruit sorbet: $6",
+      "retrieval": {
+        "documents": [
+          "restaurant_menu.pdf",
+          "allergen_guide.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 749,
+        "top_distance": 0.2653592788316539,
+        "distractor_retrieved": false,
+        "hit": true,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 137,
+          "document_name": "restaurant_menu.pdf",
+          "cosine_distance": 0.2653592788316539,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 124,
+          "document_name": "allergen_guide.pdf",
+          "cosine_distance": 0.289433698924188,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 134,
+          "document_name": "restaurant_menu.pdf",
+          "cosine_distance": 0.3138066156140975,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "137",
+      "input_tokens": 966,
+      "output_tokens": 777,
+      "total_tokens": 1743,
+      "latency_s": 6.78,
+      "judge": {
+        "score": 5,
+        "verdict": "correct",
+        "reason": "Correctly lists nut-free desserts along with their prices.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "11": {
+      "id": 11,
+      "type": "multi_hop",
+      "query": "I want a seated company dinner for 30 people. Can I use the private dining room, or what are my options?",
+      "expected_answer": "The Greenhouse Room seats at most 24, so it is too small for 30 seated guests. Options are a full Downtown buyout (25 to 90 guests, minimum spend $3,000 Sunday-Thursday or $4,500 Friday-Saturday, booked two weeks ahead) or off-site catering (minimum 20 guests, 72 hours notice).",
+      "should_answer": true,
+      "answer": "No, you cannot use the private dining room (The Greenhouse Room) for a seated dinner of 30 people because its seated capacity is up to 24 guests (it can only hold up to 35 for a standing reception). Your options for a seated company dinner of 30 guests are: 1. Full Restaurant Buyout: You can book the entire Downtown restaurant, which accommodates 25 to 90 guests seated. Minimum spend is $3,000 from Sunday to Thursday and $4,500 on Friday and Saturday, booked at least two weeks in advance. 2. Off-Site Catering: Host the dinner at your office, home, or external venue using the Catering service.",
+      "retrieval": {
+        "documents": [
+          "events_private_dining.pdf",
+          "catering.pdf",
+          "restaurant_faq.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1115,
+        "top_distance": 0.21373507812792059,
+        "distractor_retrieved": null,
+        "hit": true,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 129,
+          "document_name": "events_private_dining.pdf",
+          "cosine_distance": 0.21373507812792059,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 126,
+          "document_name": "catering.pdf",
+          "cosine_distance": 0.29373428392810885,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 136,
+          "document_name": "restaurant_faq.pdf",
+          "cosine_distance": 0.3022666268746065,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "129",
+      "input_tokens": 1406,
+      "output_tokens": 1000,
+      "total_tokens": 2406,
+      "latency_s": 5.99,
+      "judge": {
+        "score": 5,
+        "verdict": "correct",
+        "reason": "Accurately explains capacity limits and provides all alternative dining options.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "12": {
+      "id": 12,
+      "type": "multi_hop",
+      "query": "Can I use a gift card to pay for a delivery order?",
+      "expected_answer": "Yes, if the order is placed on the restaurant's website. Gift cards cannot be used on third-party delivery apps.",
+      "should_answer": true,
+      "answer": "Yes, you can use a gift card for delivery orders placed directly through The Garden Table's website. However, gift cards cannot be used to pay for delivery orders placed through third-party delivery apps.",
+      "retrieval": {
+        "documents": [
+          "delivery_and_orders.pdf",
+          "payments_and_gift_cards.pdf",
+          "restaurant_faq.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1039,
+        "top_distance": 0.25692312378148296,
+        "distractor_retrieved": null,
+        "hit": true,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 125,
+          "document_name": "delivery_and_orders.pdf",
+          "cosine_distance": 0.25692312378148296,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 133,
+          "document_name": "payments_and_gift_cards.pdf",
+          "cosine_distance": 0.2839442579845908,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 136,
+          "document_name": "restaurant_faq.pdf",
+          "cosine_distance": 0.3179231909650807,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "125",
+      "input_tokens": 1319,
+      "output_tokens": 647,
+      "total_tokens": 1966,
+      "latency_s": 3.95,
+      "judge": {
+        "score": 5,
+        "verdict": "correct",
+        "reason": "Correctly specifies website ordering vs third-party app restrictions for gift cards.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "13": {
+      "id": 13,
+      "type": "multi_hop",
+      "query": "Can my kids order from the kids menu during weekend brunch, and what is included?",
+      "expected_answer": "Yes. The kids menu (children 12 and under) is available during all service hours, including weekend brunch at Downtown. Each kids meal includes a small drink and a scoop of ice cream or sorbet.",
+      "should_answer": true,
+      "answer": "Yes, kids 12 years old and under can order from the kids menu during weekend brunch (available at the Downtown location). Each kids meal includes a small drink (apple juice, milk, or lemonade) and a scoop of vanilla ice cream or fruit sorbet.",
+      "retrieval": {
+        "documents": [
+          "kids_menu.pdf",
+          "brunch_menu.pdf",
+          "restaurant_faq.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1080,
+        "top_distance": 0.23554879771494797,
+        "distractor_retrieved": null,
+        "hit": true,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 128,
+          "document_name": "kids_menu.pdf",
+          "cosine_distance": 0.23554879771494797,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 122,
+          "document_name": "brunch_menu.pdf",
+          "cosine_distance": 0.2387985079995072,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 136,
+          "document_name": "restaurant_faq.pdf",
+          "cosine_distance": 0.295718789100642,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "128",
+      "input_tokens": 1322,
+      "output_tokens": 664,
+      "total_tokens": 1986,
+      "latency_s": 4.24,
+      "judge": {
+        "score": 5,
+        "verdict": "correct",
+        "reason": "Accurately confirms kids menu availability during brunch and what is included.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "14": {
+      "id": 14,
+      "type": "conflict",
+      "query": "How much is the corkage fee if I bring my own wine?",
+      "expected_answer": "The corkage fee is $20 per 750 ml bottle, with a maximum of two bottles per table.",
+      "should_answer": true,
+      "answer": "The corkage fee for bringing your own wine is $20 per 750 ml bottle, with a limit of two bottles per table. Note that corkage is not available for spirits.",
+      "retrieval": {
+        "documents": [
+          "restaurant_policies.pdf",
+          "policies_archive_2024.pdf",
+          "restaurant_faq.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1109,
+        "top_distance": 0.2575007984040534,
+        "distractor_retrieved": true,
+        "hit": true,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 138,
+          "document_name": "restaurant_policies.pdf",
+          "cosine_distance": 0.2575007984040534,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 130,
+          "document_name": "policies_archive_2024.pdf",
+          "cosine_distance": 0.27476351996319825,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 136,
+          "document_name": "restaurant_faq.pdf",
+          "cosine_distance": 0.29213506251238164,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "138",
+      "input_tokens": 1435,
+      "output_tokens": 714,
+      "total_tokens": 2149,
+      "latency_s": 5.94,
+      "judge": {
+        "score": 5,
+        "verdict": "correct",
+        "reason": "Provides exact corkage fee and bottle limit details.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "15": {
+      "id": 15,
+      "type": "conflict",
+      "query": "What time does the Downtown location close on Sundays?",
+      "expected_answer": "Downtown closes at 8:00 PM on Sundays.",
+      "should_answer": true,
+      "answer": "The Downtown location of The Garden Table closes at 8:00 PM on Sundays (with the kitchen taking last orders 30 minutes before closing).",
+      "retrieval": {
+        "documents": [
+          "riverside_location.pdf",
+          "location_and_parking.pdf",
+          "restaurant_policies.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1093,
+        "top_distance": 0.2910389130687744,
+        "distractor_retrieved": true,
+        "hit": true,
+        "recall": 1.0,
+        "reciprocal_rank": 0.3333
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 135,
+          "document_name": "riverside_location.pdf",
+          "cosine_distance": 0.2910389130687744,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 131,
+          "document_name": "location_and_parking.pdf",
+          "cosine_distance": 0.29629193742952775,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 138,
+          "document_name": "restaurant_policies.pdf",
+          "cosine_distance": 0.32044363252326624,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "138",
+      "input_tokens": 1392,
+      "output_tokens": 845,
+      "total_tokens": 2237,
+      "latency_s": 4.73,
+      "judge": {
+        "score": 5,
+        "verdict": "correct",
+        "reason": "Correctly states Sunday closing time for the Downtown location.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "16": {
+      "id": 16,
+      "type": "conflict",
+      "query": "How much does the grilled salmon cost on the regular menu?",
+      "expected_answer": "The regular grilled salmon costs $21. (The winter edition, December to February, costs $24.)",
+      "should_answer": true,
+      "answer": "On the regular menu, the grilled salmon costs $21.",
+      "retrieval": {
+        "documents": [
+          "seasonal_winter_menu.pdf",
+          "restaurant_menu.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1084,
+        "top_distance": 0.2368221706429361,
+        "distractor_retrieved": true,
+        "hit": true,
+        "recall": 1.0,
+        "reciprocal_rank": 0.5
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 139,
+          "document_name": "seasonal_winter_menu.pdf",
+          "cosine_distance": 0.2368221706429361,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 134,
+          "document_name": "restaurant_menu.pdf",
+          "cosine_distance": 0.27581879188789904,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 137,
+          "document_name": "restaurant_menu.pdf",
+          "cosine_distance": 0.3133578745465577,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "139",
+      "input_tokens": 1275,
+      "output_tokens": 561,
+      "total_tokens": 1836,
+      "latency_s": 7.52,
+      "judge": {
+        "score": 5,
+        "verdict": "correct",
+        "reason": "Correctly states regular menu price for grilled salmon.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "17": {
+      "id": 17,
+      "type": "conflict",
+      "query": "Is there a fee to bring my own birthday cake?",
+      "expected_answer": "Yes. A cake fee of $3 per person is charged, covering plating, candles and serving.",
+      "should_answer": true,
+      "answer": "Yes, there is a fee to bring your own birthday cake. A cake fee of $3 per person is charged, which covers plating, candles, and serving.",
+      "retrieval": {
+        "documents": [
+          "restaurant_policies.pdf",
+          "service_and_guest_experience.pdf",
+          "restaurant_faq.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1142,
+        "top_distance": 0.25316719465413373,
+        "distractor_retrieved": false,
+        "hit": true,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 138,
+          "document_name": "restaurant_policies.pdf",
+          "cosine_distance": 0.25316719465413373,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 140,
+          "document_name": "service_and_guest_experience.pdf",
+          "cosine_distance": 0.2547268260175273,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 136,
+          "document_name": "restaurant_faq.pdf",
+          "cosine_distance": 0.25847768379317126,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "138",
+      "input_tokens": 1437,
+      "output_tokens": 655,
+      "total_tokens": 2092,
+      "latency_s": 4.24,
+      "judge": {
+        "score": 5,
+        "verdict": "correct",
+        "reason": "Accurately provides birthday cake fee and what it covers.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "18": {
+      "id": 18,
+      "type": "unanswerable",
+      "query": "Is there a dress code for guests?",
+      "expected_answer": "The knowledge base does not specify a dress code for guests. (The staff handbook describes a uniform for employees only.)",
+      "should_answer": false,
+      "answer": "Based on the provided documents, there is no mention of a dress code for guests.",
+      "retrieval": {
+        "documents": [
+          "restaurant_faq.pdf",
+          "restaurant_policies.pdf",
+          "service_and_guest_experience.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1142,
+        "top_distance": 0.3255992739678295,
+        "distractor_retrieved": false,
+        "hit": null,
+        "recall": null,
+        "reciprocal_rank": null
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 136,
+          "document_name": "restaurant_faq.pdf",
+          "cosine_distance": 0.3255992739678295,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 138,
+          "document_name": "restaurant_policies.pdf",
+          "cosine_distance": 0.3369160080902248,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 140,
+          "document_name": "service_and_guest_experience.pdf",
+          "cosine_distance": 0.34565411158251236,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "136",
+      "input_tokens": 1433,
+      "output_tokens": 570,
+      "total_tokens": 2003,
+      "latency_s": 4.31,
+      "judge": {
+        "score": 5,
+        "verdict": "correct_refusal",
+        "reason": "Correctly refuses to answer as information is not in the knowledge base.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "19": {
+      "id": 19,
+      "type": "unanswerable",
+      "query": "Do you have live music on weekends?",
+      "expected_answer": "The knowledge base does not mention live music.",
+      "should_answer": false,
+      "answer": "Based on the provided documents, there is no information regarding live music on weekends.",
+      "retrieval": {
+        "documents": [
+          "restaurant_faq.pdf",
+          "riverside_location.pdf",
+          "restaurant_policies.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 1124,
+        "top_distance": 0.31416747910282683,
+        "distractor_retrieved": null,
+        "hit": null,
+        "recall": null,
+        "reciprocal_rank": null
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 136,
+          "document_name": "restaurant_faq.pdf",
+          "cosine_distance": 0.31416747910282683,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 135,
+          "document_name": "riverside_location.pdf",
+          "cosine_distance": 0.328244309388913,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 138,
+          "document_name": "restaurant_policies.pdf",
+          "cosine_distance": 0.3333575129443451,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "136",
+      "input_tokens": 1421,
+      "output_tokens": 811,
+      "total_tokens": 2232,
+      "latency_s": 4.83,
+      "judge": {
+        "score": 5,
+        "verdict": "correct_refusal",
+        "reason": "Correctly identifies that live music information is unmentioned.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    },
+    "20": {
+      "id": 20,
+      "type": "unanswerable",
+      "query": "What is the name of the head chef?",
+      "expected_answer": "The knowledge base does not mention the head chef's name.",
+      "should_answer": false,
+      "answer": "I am sorry, but the provided text does not contain information about the name of the head chef.",
+      "retrieval": {
+        "documents": [
+          "staff_handbook_excerpt.pdf",
+          "restaurant_menu.pdf"
+        ],
+        "n_chunks": 3,
+        "context_tokens": 972,
+        "top_distance": 0.3089270223464363,
+        "distractor_retrieved": true,
+        "hit": null,
+        "recall": null,
+        "reciprocal_rank": null
+      },
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 141,
+          "document_name": "staff_handbook_excerpt.pdf",
+          "cosine_distance": 0.3089270223464363,
+          "score": null
+        },
+        {
+          "rank": 2,
+          "chunk_id": 134,
+          "document_name": "restaurant_menu.pdf",
+          "cosine_distance": 0.3524983842677095,
+          "score": null
+        },
+        {
+          "rank": 3,
+          "chunk_id": 137,
+          "document_name": "restaurant_menu.pdf",
+          "cosine_distance": 0.35561435219468773,
+          "score": null
+        }
+      ],
+      "cited_chunk_id": "141",
+      "input_tokens": 1187,
+      "output_tokens": 463,
+      "total_tokens": 1650,
+      "latency_s": 3.81,
+      "judge": {
+        "score": 5,
+        "verdict": "correct_refusal",
+        "reason": "Correctly notes the head chef's name is not provided.",
+        "model": "gemini-3.6-flash"
+      },
+      "manual_score": null
+    }
+  },
+  "judge_summary": "All answers provided by the assistant are highly accurate, complete, and correctly handle both answerable and unanswerable questions according to the ground truth."
+}

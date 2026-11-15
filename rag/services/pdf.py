@@ -33,3 +33,15 @@ def process_difficult_pdf(pdf_path):
 
         return pdf_pages, pdf_text
 
+
+def extract_lines(pdf_path) -> list[str]:
+    """Non-empty text lines in reading order. process_difficult_pdf flattens
+    whitespace, so titles and section headings are read from here instead."""
+    lines = []
+    with pdfplumber.open(pdf_path) as pdf:
+        for page in pdf.pages:
+            for line in (page.extract_text() or "").splitlines():
+                line = " ".join(line.split())
+                if line:
+                    lines.append(line)
+    return lines

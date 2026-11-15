@@ -1,6 +1,6 @@
 # Evaluating a RAG pipeline: notes, findings and lessons
 
-This document records how the retrieval-augmented search in this project was evaluated: what the first attempt got wrong, how the evaluation was rebuilt, what the measurements show, and the reasoning behind each decision. Results still to come are marked **pending**.
+This document records how the retrieval-augmented search in this project was evaluated: what the first attempt got wrong, how the evaluation was rebuilt, what the measurements show, and the reasoning behind each decision.
 
 - Harness and how to run it: [`rag/evaluation/README.md`](../rag/evaluation/README.md)
 - Generated tables: [`rag/evaluation/results/REPORT.md`](../rag/evaluation/results/REPORT.md)
@@ -15,7 +15,7 @@ This document records how the retrieval-augmented search in this project was eva
 6. [Retrieval results](#6-retrieval-results)
 7. [Why small chunks win here](#7-why-small-chunks-win-here)
 8. [Overlap is not context: contextual chunk headers](#8-overlap-is-not-context-contextual-chunk-headers)
-9. [Generation results (pending)](#9-generation-results-pending)
+9. [Generation results and the chosen configuration](#9-generation-results-and-the-chosen-configuration)
 10. [Engineering problems found along the way](#10-engineering-problems-found-along-the-way)
 11. [Limitations](#11-limitations)
 12. [Next experiments](#12-next-experiments)
@@ -26,12 +26,15 @@ This document records how the retrieval-augmented search in this project was eva
 
 ## 1. Summary
 
+**Chosen configuration: 256-token chunks with contextual headers, top 3, no reranker** (`medium_chunks_ctx`). It scored 4.95/5 on answers, 99% of the best configuration (whole documents, 5.00), with 37% less retrieved context, and unlike whole documents it still works when documents are long.
+
 - **The first evaluation picked the wrong winner.** It reported "reranked, top 10" as best. In fact the knowledge base was so small that top 10 sent almost all of it to the LLM, the reranker didn't remove anything, and "retrieval recall" was read from the LLM's own answer instead of from the database.
 - **Measure retrieval and generation separately.** Retrieval quality can be measured without calling the LLM. That made it possible to compare 24 configurations on a free tier of 20 LLM requests a day.
 - **Small chunks (128 tokens) with top 3 gave the best retrieval per token:** every answerable question got a relevant document, with 96% recall and ~350 tokens of context. Whole-document chunks matched that recall at 3x the tokens. Medium chunks (256) were the worst at every small top-k.
 - **The reranker wasn't worth it here:** a small gain in ranking, at 400x to 2,500x the retrieval latency on CPU, and it did not filter outdated documents.
-- **A distance threshold looks able to detect unanswerable questions:** on 128-token chunks every answerable question's best match was closer than every unanswerable one's.
-- **Chunk overlap does not carry document-level context.** A chunk from the middle of an archived policy doesn't say "archived". Contextual chunk headers (prefixing each chunk with its document title and section) are being tested to fix that.
+- **A distance threshold could separate unanswerable questions, but it wasn't needed:** on 128-token chunks every answerable question's best match was closer than every unanswerable one's. In practice the LLM already refused correctly on every unanswerable question without it, and the threshold cost one real answer (Q15).
+- **Chunk overlap does not carry document-level context.** A chunk from the middle of an archived policy doesn't say "archived". Contextual chunk headers (prefixing each chunk with its document title and section) fix much of it: with headers, 256-token chunks went from the worst setting to the best (98% recall, MRR 0.97), while on 128-token chunks the effect was mixed. In the answers, headers fixed the incomplete answers of small chunks; the feared confusion with archived rules didn't happen in any configuration.
+- **Retrieval metrics alone would have picked the wrong setting.** 128-token chunks had the best retrieval per token, but in the answers the right document often arrived without the paragraph that held the answer.
 
 ## 2. The system under test
 
@@ -180,7 +183,18 @@ Cosine distance of the best match for each question, on chunk128:
 - All 17 answerable questions: **0.187 – 0.266**
 - All 3 unanswerable questions: **0.296 – 0.315**
 
-A threshold in the gap (about 0.28) would give the LLM no context at all for unanswerable questions, which makes "I don't know" the natural answer. On chunk256 the gap doesn't exist: a threshold of 0.30 removed the unanswerable questions' context but also lost Q15, whose correct chunk sat at 0.297. **Pending:** thresholds 0.27, 0.28 and 0.29 on chunk128. With only 3 unanswerable questions this is a promising signal, not a proven setting.
+A threshold in the gap gives the LLM no context at all for unanswerable questions, which makes "I don't know" the natural answer. On chunk256 the gap doesn't exist: a threshold of 0.30 removed the unanswerable questions' context but also lost Q15, whose correct chunk sat at 0.297.
+
+Second sweep, chunk128 top 3:
+
+| Threshold | Hit | Recall | Context tokens | Chunks on unanswerable | Answerable questions hurt |
+|---|---|---|---|---|---|
+| none | 100% | 96% | 352 | 3.0 | — |
+| 0.27 | 94% | 84% | 252 | **0** | Q2, Q10 (partial), Q15 (lost) |
+| 0.28 | 94% | 84% | 265 | **0** | Q2, Q10 (partial), Q15 (lost) |
+| **0.29** | 94% | 90% | 292 | **0** | **Q15 only** |
+
+0.29 removes all context for the three unanswerable questions and loses one answerable question: Q15, where the correct chunk ranks behind the Riverside document and sits just past the threshold. That's the cost of the threshold, and the generation stage measures whether it's worth paying. With only 3 unanswerable questions this is a promising signal, not a proven setting.
 
 ### 6.5 A high distractor rate isn't automatically bad
 
@@ -269,24 +283,59 @@ Overlap and headers address different scopes and work best together: overlap for
 - **Cost accounting:** header tokens are counted in "context tokens", so the comparison with plain chunks is fair.
 - **Opt-in:** enabled per corpus (`contextual_headers=True`); the API default is unchanged.
 
-**Pending:**
-- Retrieval sweep on `chunk128_ctx` and `chunk256_ctx`. Prediction: chunk256 improves the most, since its nameless half-document chunks gain a title.
-- Generation finalist `small_chunks_ctx`, compared with `small_chunks` and `whole_docs` on the conflict questions (Q14–Q17).
+### 8.5 Retrieval results
 
-## 9. Generation results (pending)
+The prediction was that chunk256 would improve the most, since its nameless half-document chunks gain a title. It did:
 
-Four finalists, one per day:
+| top 3 | Hit | Recall | MRR | Distractor | Tokens |
+|---|---|---|---|---|---|
+| chunk256 | 88% | 81% | 0.81 | 46% | 588 |
+| **chunk256 + headers** | **100%** | **98%** | **0.97** | **38%** | 676 |
+| chunk128 | 100% | 96% | 0.93 | 46% | 352 |
+| chunk128 + headers | 100% | 92% | 0.96 | 62% | 405 |
+| chunk512 | 100% | 98% | 0.93 | 69% | 1,075 |
 
-| Experiment | Retrieval | Question it answers |
-|---|---|---|
-| `small_chunks` | chunk128, top 3 | Does the best retrieval-per-token setting also give good answers? |
-| `whole_docs` | chunk512, top 3 | Does 3x the context (with "ARCHIVED" visible) help on conflicts? |
-| `small_chunks_threshold` | chunk128, top 3, threshold 0.28 | Does giving no context on unanswerable questions improve refusals without losing real answers? |
-| `small_chunks_ctx` | chunk128 + headers, top 3 | Do headers give small chunks the context they're missing? |
+- **chunk256 + headers is the best retrieval setting in the sweep.** It fixed the two misses from section 6.2: on Q17 (cake fee) the current policy now ranks first, ahead of the kids menu and the archive, and on Q15 (Downtown Sunday hours) the right document now arrives (Riverside still ranks first). Q7 now gets both documents, and Q9's recall went from 33% to 67%. It matches whole-document recall at 63% of the tokens, with the fewest distractors at top 3.
+- **On chunk128 the effect is mixed.** The first result improves (MRR 0.93 → 0.96, top-1 hit 88% → 94%), but recall drops: for Q11 all three slots went to the events document and catering was pushed out, and Q7 lost its second document the same way. Look-alike documents also appear more often (winter menu, catering, staff handbook).
+- **A likely explanation, not tested:** every chunk of a document repeats the same ~25-token header. In a 128-token chunk that's about 16% of the embedded text, about twice its share at 256. Chunks of the same document become more similar to each other and fill all the slots, and documents with similar titles ("Restaurant Menu" / "Winter Seasonal Menu") move closer together. At 256 the header identifies the document without dominating the embedding.
+- **The distance gap for unanswerable questions doesn't change** (about 0.03 in every corpus), so headers neither help nor hurt the threshold.
 
-What would count as evidence:
-- If `small_chunks` misses Q14 or Q17 because the archived chunk had no warning, and `whole_docs` or `small_chunks_ctx` gets them right, that confirms the context tradeoff and that headers fix it cheaply.
-- If `small_chunks_threshold` scores 5 on all three unanswerable questions without losing answerable ones, the threshold is useful.
+The generation finalist is therefore `medium_chunks_ctx` (chunk256 + headers, top 3) rather than the 128 variant.
+
+## 9. Generation results and the chosen configuration
+
+Each finalist answered all 20 questions through the real API code path, and an LLM judge graded every answer from 1 to 5 against the expected answer (rubric in section 4.3).
+
+| Experiment | Retrieval | Avg score | Single | Multi-hop | Conflict | Unanswerable | False refusals | Retrieved context | Total tokens |
+|---|---|---|---|---|---|---|---|---|---|
+| `whole_docs` | chunk512, top 3 | **5.00** | 5.00 | 5.00 | 5.00 | 5.00 | 0 | 1,075 | 2,043 |
+| **`medium_chunks_ctx`** | chunk256 + headers, top 3 | **4.95** | 5.00 | 4.80 | 5.00 | 5.00 | 0 | 676 | 1,677 |
+| `small_chunks` | chunk128, top 3 | 4.60 | 4.12 | 4.80 | 5.00 | 5.00 | 1 | 352 | 1,384 |
+| `small_chunks_threshold` | chunk128, top 3, threshold 0.29 | 4.55 | 4.50 | 4.80 | 4.00 | 5.00 | 2 | 292 | 1,222 |
+
+"Retrieved context" is the chunk text sent to the LLM; "total tokens" adds the prompt, the question and the answer. Every answer below 5:
+
+| Question | small_chunks | threshold | whole_docs | medium_ctx | Why |
+|---|---|---|---|---|---|
+| Q3 private room capacity + minimum spend | 3 | 5 | 5 | 5 | The chunk with the minimum spend didn't include the capacity |
+| Q5 food waste | 4 | 5 | 5 | 5 | Missed one figure |
+| Q8 catering minimum guests + notice | **1** | **1** | 5 | 5 | "Not mentioned": the right document arrived, but not the paragraph with "Minimum order: 20 guests" |
+| Q10 nut-free desserts + prices | 4 | 4 | 5 | 4 | Missed one price (prices are in the menu, nut information in the allergen guide) |
+| Q15 Downtown Sunday closing time | 5 | **1** | 5 | 5 | The threshold removed the right chunk (predicted in section 6.4) |
+
+### What each hypothesis turned out to be
+
+- **Small chunks lose the part of the document that holds the answer: confirmed.** The best retrieval-per-token setting gave the worst single-document answers (4.12). Retrieval metrics are document-level (section 5), so they can't see that the right document arrived without the right paragraph. Both larger chunks (`whole_docs`) and headers (`medium_chunks_ctx`) fixed Q3 and Q8.
+- **Without "ARCHIVED" in the chunk, the LLM would use the archived rules: not confirmed.** Every configuration scored 5 on all four conflict questions. The section headings ("Bringing your own wine (2024)") were enough for the LLM to pick the current rule. On this data, headers helped retrieval and completeness, not conflict resolution.
+- **A threshold improves refusals without losing answers: rejected.** All four configurations scored 5 on all three unanswerable questions, so there was nothing to improve, and the threshold cost Q15 (Q8 failed with and without it). On this data the LLM's own judgement was a better "no answer" filter than a distance cutoff.
+
+### Why `medium_chunks_ctx` and not `whole_docs`
+
+`whole_docs` scored highest, but its advantage is one point on one question (Q10), and it sends 59% more retrieved context per question. More importantly, it works only because these documents are short enough that 512 tokens is a whole document (section 7). On real documents of several pages, a 512-token chunk is a fragment without a title, the chunk256 problem again, so the "whole document" option disappears. Chunks with headers keep working at any document length, because every chunk names its document and section.
+
+### And the reranker
+
+It wasn't a generation finalist. In the retrieval sweep it improved only the first position, didn't change recall at 3 chunks, didn't filter outdated documents, and added 2–14 seconds per query on CPU. It's worth considering for larger corpora where the right chunk is often outside the top few, or where first-position precision matters a lot; at this scale it isn't.
 
 ## 10. Engineering problems found along the way
 
@@ -294,19 +343,22 @@ What would count as evidence:
 2. **A shared code path broke search.** A change to support tool calling for the chat agent made the Gemini provider always call `available_tools.get_tools_schemas()`, which crashed for search, where there are no tools. It also gave every call the agent's system prompt. Tools and the agent prompt now apply to chat only.
 3. **A batched embedding call returned fewer vectors than texts, and nothing noticed.** With `gemini-embedding-2`, a list of 18 strings came back as fewer vectors. My guess is that the model merged them; this wasn't confirmed against the API. The code paired texts and vectors with `zip`, which silently stops at the shorter list, and the bug surfaced later as a confusing `KeyError`. Now each text goes in its own request entry, the count is checked, the pairing is strict, and there's a one-by-one fallback.
 4. **Filtered vector search can return fewer than k results.** All corpora live in one table and are filtered by document. With an HNSW index, pgvector applies the filter *after* scanning about `ef_search` (40) candidates, so a filtered top-k can come back short. The corpora are small, so the evaluation sets `hnsw.ef_search = 1000`, which makes the search effectively exact.
-5. **Free-tier quotas shape the design.** 20 generation requests a day means: cache everything that can be cached (query vectors, corpora), separate free retrieval measurement from paid generation, make runs resumable, grade in one batched judge request, and allow the judge to use another model's quota.
+5. **Contextual headers were built from text that had no lines.** The app's PDF extraction flattens all whitespace (`" ".join(text.split())`), so the stored text is a single line. The header builder took "the first line" as the title, and every header ended up containing the entire document: 1,500 characters instead of ~100. The first `_ctx` sweep therefore measured "chunk + whole document" and was discarded. It showed up as a token count that made no sense (485 context tokens for one 128-token chunk). The cause: the header code had been checked on text extracted *with* line breaks, not on what the pipeline actually stores. The fix reads titles and headings from the PDF's layout lines and locates them in the flattened text. The tests now use flattened text, like production. **Lesson: test data transformations on the data the pipeline actually produces, and sanity-check every metric against what it should be.**
+6. **Rate limits are per minute.** Embedding two corpora back to back exceeded the free tier's 30,000 tokens per minute, and Celery's 10-second retries all landed in the same minute. Rate-limited embedding tasks now wait 60 seconds before retrying.
+7. **Free-tier quotas shape the design.** 20 generation requests a day means: cache everything that can be cached (query vectors, corpora), separate free retrieval measurement from paid generation, make runs resumable, grade in one batched judge request, and allow the judge to use another model's quota.
 
 ## 11. Limitations
 
 - **Small sample.** 17 answerable and 3 unanswerable questions, one run per configuration. Differences of one or two questions are noise.
 - **Synthetic, short documents.** The findings about chunk size depend on 250–550-token documents (section 7).
 - **Document-level metrics.** They don't check whether the exact passage arrived, and they don't penalize large chunks for irrelevant text (only token cost does).
-- **The judge is an LLM**, of the same family as the answering model, and may be lenient toward it. Its grades should be spot-checked.
+- **The judge is an LLM**, the same model as the one answering (`gemini-3.6-flash`), and may be lenient toward it. It gave a 5 to 72 of the 80 answers, so the top configurations hit the ceiling: 4.95 vs 5.00 is one point on one question.
+- **Latency isn't comparable between runs.** Some generation runs include retry waits inside the Gemini SDK of up to 12 minutes, which inflate the averages in `REPORT.md`. Median latency was 5–22 seconds per answer.
 - **Mid-word chunk boundaries.** The token chunker splits at token counts, sometimes mid-word ("…00 AM to 10:30 PM"). That adds noise to every configuration equally, but a sentence-aware chunker could change the picture.
 
 ## 12. Next experiments
 
-- Contextual headers (in progress, section 8).
+- Use the chosen configuration in a chat agent connected to messaging channels.
 - A threshold-based "no answer" path in the API itself, using the measured distance gap.
 - Sentence- or heading-aware chunking instead of fixed token windows.
 - Metadata filtering for document status (`archived`) and location.
@@ -334,3 +386,5 @@ What would count as evidence:
 | 2026-10-29 | Fixed batched query embeddings with `gemini-embedding-2` (section 10.3) |
 | 2026-10-30 | First retrieval sweep (24 configurations): section 6 |
 | 2026-11-08 | Analyzed why chunk size 128 wins (section 7); added a chunk128 threshold sweep, four generation finalists and contextual chunk headers (section 8) |
+| 2026-11-09 | Second sweep: threshold 0.29 chosen (section 6.4). First contextual-header sweep discarded due to a bug (section 10.5); fixed and re-run: headers make chunk256 the best retrieval setting (section 8.5). First generation run (`small_chunks`, 12/20 answered; two runs overlapped and used the quota, so generation now takes a lock) |
+| 2026-11-13 | All four generation runs and judge grades complete (section 9). Chosen configuration: `medium_chunks_ctx` |

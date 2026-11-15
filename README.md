@@ -157,8 +157,24 @@ Wiring up chunking, retrieval and reranking is the easy part. Knowing which chun
 
 - **Knowledge base:** 20 synthetic documents about a fictional restaurant (~8k tokens), written in Markdown (`rag/evaluation/data/kb_source/`) and rendered to PDF. It contains deliberate traps: a second location with different hours, an archived 2024 policy, a winter menu with different prices, and a staff-only dress code.
 - **Dataset:** 20 questions, each labelled with the documents that answer it and the distractors that shouldn't: single-document, multi-hop, conflicting-information and unanswerable.
-- **Stage 1, retrieval sweep:** 24 configurations, one variable at a time. Query vectors are embedded once and cached, so the sweep makes no LLM calls. Measures hit rate, recall, MRR, distractor rate and context tokens from the real retrieval results.
+- **Stage 1, retrieval sweep:** 35 configurations, one variable at a time. Query vectors are embedded once and cached, so the sweep makes no LLM calls. Measures hit rate, recall, MRR, distractor rate and context tokens from the real retrieval results.
 - **Stage 2, generation:** a few finalists answer the dataset through the real `/api/search/` path, and an LLM judge grades all answers in one request. Runs are resumable, so they fit a 20-requests-per-day free tier.
+
+### Results
+
+| Configuration | Answer score (1-5) | Retrieved context | Notes |
+|---|---|---|---|
+| Whole documents (512-token chunks), top 3 | **5.00** | 1,075 tokens | Works only because the documents are short |
+| **256-token chunks + contextual headers, top 3** | **4.95** | **676 tokens** | **Chosen:** same quality, 37% less context, scales to long documents |
+| 128-token chunks, top 3 | 4.60 | 352 tokens | Best retrieval per token, but the right document often arrived without the paragraph that held the answer |
+| 128-token chunks + distance threshold | 4.55 | 292 tokens | The LLM already refused unanswerable questions; the threshold cost a real answer |
+
+What the evaluation showed:
+
+- **Contextual chunk headers** (prefixing every chunk with its document title and section) turned 256-token chunks from the worst retrieval setting into the best: recall 81% → 98%, MRR 0.81 → 0.97.
+- **Chunk overlap doesn't carry document-level context.** A chunk from the middle of an archived policy doesn't say "archived"; only something like a header does.
+- **Retrieval metrics alone would have picked the wrong setting.** The configuration with the best retrieval per token gave the weakest answers.
+- **The reranker wasn't worth it at this scale:** it only improved the first position, didn't filter outdated documents, and added 2–14 s per query on CPU.
 
 The first version of this harness (`results/v1_pilot/`) produced a confident-looking winner that turned out to be a measurement artifact; [its write-up](rag/evaluation/results/v1_pilot/README.md) explains what was wrong. **The full write-up (findings, why small chunks win, why overlap doesn't carry document context, and the engineering problems found) is in [`docs/rag-evaluation-notes.md`](docs/rag-evaluation-notes.md).** Current tables are in `rag/evaluation/results/REPORT.md`; how to reproduce a run is in [`rag/evaluation/README.md`](rag/evaluation/README.md).
 

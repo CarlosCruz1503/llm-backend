@@ -231,21 +231,28 @@ Guests could bring their own wine. The corkage fee was $15 per bottle.
 
 
 class ContextualChunkHeaderTests(TestCase):
-    """Contextual chunk headers (rag/services/chunks.py)."""
+    """Contextual chunk headers (rag/services/chunks.py).
+
+    The stored text is whitespace-flattened like process_difficult_pdf does,
+    so titles and headings must come from the PDF lines, not from `text`.
+    """
+
+    LINES = ARCHIVE_TEXT.splitlines()
+    FLAT_TEXT = " ".join(ARCHIVE_TEXT.split())
 
     def test_title_is_the_first_line(self):
-        self.assertEqual(document_title(ARCHIVE_TEXT), "The Garden Table - Restaurant Policies 2024 (ARCHIVED)")
+        self.assertEqual(document_title(self.LINES), "The Garden Table - Restaurant Policies 2024 (ARCHIVED)")
 
     def test_wrapped_title_is_joined(self):
-        text = "The Garden Table Downtown - Location, Parking and\nTransport\nAddress\n214 Alder Street.\n"
+        lines = ["The Garden Table Downtown - Location, Parking and", "Transport", "Address", "214 Alder Street."]
 
-        self.assertEqual(document_title(text), "The Garden Table Downtown - Location, Parking and Transport")
+        self.assertEqual(document_title(lines), "The Garden Table Downtown - Location, Parking and Transport")
 
     def test_header_names_the_document_and_the_section_in_effect_at_chunk_start(self):
-        corkage = ARCHIVE_TEXT.index("Guests could")
+        corkage = self.FLAT_TEXT.index("Guests could")
         chunks = [SimpleNamespace(start_index=0), SimpleNamespace(start_index=corkage)]
 
-        headers = build_chunk_headers(ARCHIVE_TEXT, chunks)
+        headers = build_chunk_headers(self.FLAT_TEXT, self.LINES, chunks)
 
         self.assertEqual(headers[0], "Document: The Garden Table - Restaurant Policies 2024 (ARCHIVED)")
         self.assertEqual(
@@ -253,21 +260,24 @@ class ContextualChunkHeaderTests(TestCase):
             "Document: The Garden Table - Restaurant Policies 2024 (ARCHIVED)\nSection: Bringing your own wine (2024)",
         )
 
-    def test_chunks_store_the_header_and_embed_it_with_the_text(self):
-        document = _create_document(file_name="archive.pdf", text_content=ARCHIVE_TEXT)
+    @patch("rag.services.chunks.extract_lines", return_value=ARCHIVE_TEXT.splitlines())
+    def test_chunks_store_a_short_header_and_embed_it_with_the_text(self, _extract_lines):
+        document = _create_document(file_name="archive.pdf", text_content=self.FLAT_TEXT)
 
         chunks = create_and_save_chunks(document, "cl100k_base", chunk_size=20, chunk_overlap=0, contextual_headers=True)
 
         last = chunks[-1]
-        self.assertIn("(ARCHIVED)", last.header)
+        self.assertEqual(
+            last.header,
+            "Document: The Garden Table - Restaurant Policies 2024 (ARCHIVED)\nSection: Bringing your own wine (2024)",
+        )
         self.assertNotIn("ARCHIVED", last.text)
         self.assertEqual(last.contextual_text, f"{last.header}\n---\n{last.text}")
 
     def test_chunks_have_no_header_by_default(self):
-        document = _create_document(file_name="archive.pdf", text_content=ARCHIVE_TEXT)
+        document = _create_document(file_name="archive.pdf", text_content=self.FLAT_TEXT)
 
         chunks = create_and_save_chunks(document, "cl100k_base", chunk_size=20, chunk_overlap=0)
 
         self.assertTrue(all(chunk.header is None for chunk in chunks))
         self.assertEqual(chunks[0].contextual_text, chunks[0].text)
-
