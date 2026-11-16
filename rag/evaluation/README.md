@@ -1,10 +1,81 @@
 # RAG Evaluation
 
-Which chunk size, top_k, distance threshold and reranker setting works best for this project? This harness answers that with measurements instead of guesses, within a free-tier quota of about 20 LLM requests per day.
+Which chunk size, overlap, top_k, distance threshold and reranker setting works best for *your* documents? This harness answers that with measurements instead of guesses, within a free-tier quota of about 20 LLM requests per day. It ships with a sample knowledge base (a fictional restaurant), and you can swap in your own: see [Evaluate your own documents](#evaluate-your-own-documents).
 
 The first version of this evaluation gave a misleading result; [`results/v1_pilot/README.md`](results/v1_pilot/README.md) explains why and what this version does differently. The full story, findings and reasoning are in [`docs/rag-evaluation-notes.md`](../../docs/rag-evaluation-notes.md).
 
-## Knowledge base
+## Evaluate your own documents
+
+### 1. Documents
+
+Put your PDFs in `data/testset_files/` and remove the sample ones. Every PDF in that folder is part of the knowledge base. Alternatively, write the documents as Markdown in `data/kb_source/` and run `make eval_kb` to render them.
+
+Contextual headers use each document's first line as its title, and short lines that don't end with a period as section headings. That fits most business documents (a title, then sections). If yours are laid out differently, adjust `document_title` and `_is_heading` in `rag/services/chunks.py`.
+
+### 2. Questions
+
+Write 15–30 questions in `dataset.json`. Use questions your users would really ask, and label them honestly: the labels are what everything is scored against.
+
+```json
+{
+  "id": 1,
+  "type": "single",
+  "query": "Do you deliver on Sundays?",
+  "expected_answer": "Yes, from 12:00 to 20:00, within 5 km.",
+  "relevant_documents": ["delivery.pdf"],
+  "distractor_documents": ["delivery_2023_archived.pdf"],
+  "should_answer": true
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `id` | Unique number |
+| `type` | `single`, `multi_hop`, `conflict` or `unanswerable`. The report shows one column per type. |
+| `query` | The question, as a user would write it |
+| `expected_answer` | What a correct answer says. The judge compares against this. |
+| `relevant_documents` | File names that contain the answer. Empty for unanswerable questions. |
+| `distractor_documents` | Optional: files that look relevant but would give a wrong answer (old versions, other locations…) |
+| `should_answer` | `false` when the documents don't contain the answer |
+
+Include a few questions that your documents *can't* answer: they check whether the model admits it instead of inventing something.
+
+### 3. Configurations
+
+`experiments.py` defines three things:
+
+```python
+CORPORA = {          # how documents are chunked; each corpus is embedded once
+    corpus.key: corpus
+    for corpus in [
+        Corpus("chunk256_ctx", chunk_size=256, chunk_overlap=48, contextual_headers=True),
+        Corpus("chunk512", chunk_size=512, chunk_overlap=96),
+    ]
+}
+# RETRIEVAL_SWEEP: every retrieval setting to compare for free (corpus, top_k, threshold, reranker)
+# GENERATION_EXPERIMENTS: the few finalists that get real answers, graded by the judge
+GENERATION_EXPERIMENTS = {
+    "headers": RetrievalConfig("headers", "chunk256_ctx", top_k=3),
+    "whole_docs": RetrievalConfig("whole_docs", "chunk512", top_k=3),
+}
+```
+
+### 4. Run
+
+```bash
+make eval_retrieval                 # free: compares every retrieval setting
+make eval_generate EXP=headers      # 1 LLM request per question; resumes if it stops
+make eval_judge EXP=headers         # 1 request for all answers
+```
+
+Results are in `results/REPORT.md`. Start with the retrieval table: the configurations that get the relevant documents into the context with the fewest tokens are your finalists. Then compare their answer scores.
+
+Notes:
+- Changing a document re-embeds only that document. A removed document is dropped from each corpus the next time that corpus is used.
+- Each corpus is embedded through the free tier's embedding quota (30,000 tokens per minute). If it hits the limit, the tasks wait and retry; if some documents still fail, run the command again.
+- With 20 generation requests a day, plan one finalist per day, or set `EVAL_JUDGE_MODEL` to a different model so judging doesn't use the same quota.
+
+## Sample knowledge base
 
 20 synthetic documents about The Garden Table, a fictional restaurant with two locations (~8k tokens in total). The Markdown files in `data/kb_source/` are the source of truth; `scripts/build_kb.py` renders them to the PDFs in `data/testset_files/` that go through the real ingestion pipeline.
 
@@ -17,7 +88,7 @@ Some documents are there to trip up retrieval:
 | Seasonal menu with different prices | `seasonal_winter_menu` vs `restaurant_menu` |
 | Dress code that applies to staff, not guests | `staff_handbook_excerpt` |
 
-## Dataset
+## Sample dataset
 
 `dataset.json` has 20 questions, each with an `expected_answer`, the `relevant_documents` that contain the answer and the `distractor_documents` that look relevant but aren't:
 

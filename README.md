@@ -1,13 +1,21 @@
-# LLM Platform API
+# LLM Platform API + RAG evaluation lab
 
 [![CI](https://github.com/CarlosCruz1503/llm-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/CarlosCruz1503/llm-backend/actions/workflows/ci.yml)
 
-A Django REST backend that ties together three things you'd normally see split across separate side projects: a **provider-agnostic LLM abstraction** (swap Gemini/OpenRouter without touching call sites), an **async-first RAG ingestion pipeline** (PDF → chunks → embeddings, orchestrated with Celery), and a **token-budgeted chat system**. It's API-only by design — a REST surface meant to be driven by any client (curl, a frontend, another service), not a bundled UI.
+**Which chunk size, overlap, top-k, distance threshold or reranker should your RAG use?** Most tutorials pick numbers and move on. This repo lets you **measure** them on your own documents: add your PDFs and a few questions with known answers, and you get a report that compares dozens of retrieval configurations, plus the answer quality of the best few, graded by an LLM judge. It runs on Gemini's free tier.
+
+- **[Test your own RAG configuration](#test-your-own-rag-configuration)**: step-by-step guide
+- **[What the evaluation showed](#what-the-evaluation-showed)**: the configuration chosen for a small-business knowledge base, and why
+- **[Full write-up](docs/rag-evaluation-notes.md)**: method, results, the bugs found along the way
+
+Underneath is a working Django REST backend that ties together three things you'd normally see split across separate side projects: a **provider-agnostic LLM abstraction** (swap Gemini/OpenRouter without touching call sites), an **async-first RAG ingestion pipeline** (PDF → chunks → embeddings, orchestrated with Celery), and a **token-budgeted chat system**. It's API-only by design — a REST surface meant to be driven by any client (curl, a frontend, another service), not a bundled UI.
 
 This README leads with *why* things are built the way they are, since that's usually more interesting than *what* the endpoints are.
 
 ## Contents
 
+- [Test your own RAG configuration](#test-your-own-rag-configuration)
+- [What the evaluation showed](#what-the-evaluation-showed)
 - [Architecture at a glance](#architecture-at-a-glance)
 - [Design decisions worth reading](#design-decisions-worth-reading)
 - [The RAG pipeline](#the-rag-pipeline)
@@ -22,6 +30,56 @@ This README leads with *why* things are built the way they are, since that's usu
 - [Testing & CI](#testing--ci)
 - [Adding a new LLM provider](#adding-a-new-llm-provider)
 - [Known limitations / roadmap](#known-limitations--roadmap)
+
+## Test your own RAG configuration
+
+You need Docker and a Gemini API key (the free tier is enough).
+
+1. **Start the stack**
+   ```bash
+   git clone https://github.com/CarlosCruz1503/llm-backend.git && cd llm-backend
+   cp .env.example .env      # set GEMINI_API_KEY (and SECRET_KEY)
+   make build && make up && make migrate && make superuser
+   ```
+2. **Add your documents** to `rag/evaluation/data/testset_files/` as PDFs, replacing the sample restaurant files. You can also write them as Markdown in `rag/evaluation/data/kb_source/` and render them with `make eval_kb`.
+3. **Write 15–30 questions** in `rag/evaluation/dataset.json`, each with the expected answer and the file names that contain it. Include a few questions your documents *can't* answer, to check the model admits it. The format is in the [evaluation guide](rag/evaluation/README.md#evaluate-your-own-documents).
+4. **Choose what to compare** in `rag/evaluation/experiments.py`: chunk sizes, overlap, contextual headers, top-k, thresholds, reranker.
+5. **Run the free retrieval sweep.** It makes no LLM calls; your documents and questions are embedded once and cached.
+   ```bash
+   make eval_retrieval       # writes rag/evaluation/results/REPORT.md
+   ```
+6. **Check the answers of the best 2–4 configurations.** Each run costs one LLM request per question, and runs resume where they stopped if you hit the daily quota.
+   ```bash
+   make eval_generate EXP=<name>   # finalists are defined in experiments.py
+   make eval_judge EXP=<name>      # grades every answer in one request
+   ```
+
+`REPORT.md` then shows, for every configuration, how often the right documents reached the LLM, how many tokens that cost, and how good the final answers were.
+
+## What the evaluation showed
+
+The sample knowledge base is a fictional restaurant: 20 short pages (menu, policies, hours, events, a second location, an archived policy…) and 20 questions, including multi-hop, conflicting-information and unanswerable ones.
+
+**Chosen configuration for this kind of knowledge base:** small, single-topic pages, as a restaurant, a shop or a small service business would have:
+
+| Setting | Value |
+|---|---|
+| Chunk size / overlap | 256 tokens / ~20% (48 tokens) |
+| Contextual header on every chunk | Yes: document title + section |
+| Chunks sent to the LLM (top-k) | 3 |
+| Reranker | No |
+
+It scored 4.95/5 on answers, the same quality as sending whole documents, with 37% less context.
+
+**General lessons:**
+
+- **A reranker doesn't pay off on small datasets.** With only a few dozen chunks, the right one is usually already in the top 3, so the reranker mostly reorders them and adds 2–14 seconds per query on CPU. It earns its cost on large collections, where the right chunk is often outside the first results.
+- **Give every chunk a header with its document and section.** Overlap only keeps sentences from being cut at chunk boundaries. A chunk from the middle of a page doesn't know which page, section or version it belongs to unless you tell it. Adding that header was one of the biggest improvements in the whole evaluation.
+- **Pick chunk size by how much text a question needs.** Chunks that are too small deliver the right page without the paragraph that holds the answer. Chunks that are too large mix topics and get harder to match. On short pages, 256 tokens with a header was the balance.
+- **Judge configurations by their answers, not only by retrieval scores.** The setup with the best retrieval scores per token gave the weakest answers.
+- **Sending whole documents only works while documents are short.** It scored highest here, but it stops being an option once pages get long. Chunks with headers keep working.
+
+How each of these was measured, with the numbers, is in the [full write-up](docs/rag-evaluation-notes.md) and in [Evaluating RAG configurations](#evaluating-rag-configurations) below.
 
 ## Architecture at a glance
 
@@ -160,7 +218,7 @@ Wiring up chunking, retrieval and reranking is the easy part. Knowing which chun
 - **Stage 1, retrieval sweep:** 35 configurations, one variable at a time. Query vectors are embedded once and cached, so the sweep makes no LLM calls. Measures hit rate, recall, MRR, distractor rate and context tokens from the real retrieval results.
 - **Stage 2, generation:** a few finalists answer the dataset through the real `/api/search/` path, and an LLM judge grades all answers in one request. Runs are resumable, so they fit a 20-requests-per-day free tier.
 
-### Results
+### Results on the sample knowledge base
 
 | Configuration | Answer score (1-5) | Retrieved context | Notes |
 |---|---|---|---|
@@ -169,14 +227,14 @@ Wiring up chunking, retrieval and reranking is the easy part. Knowing which chun
 | 128-token chunks, top 3 | 4.60 | 352 tokens | Best retrieval per token, but the right document often arrived without the paragraph that held the answer |
 | 128-token chunks + distance threshold | 4.55 | 292 tokens | The LLM already refused unanswerable questions; the threshold cost a real answer |
 
-What the evaluation showed:
+The measurements behind the [lessons above](#what-the-evaluation-showed):
 
 - **Contextual chunk headers** (prefixing every chunk with its document title and section) turned 256-token chunks from the worst retrieval setting into the best: recall 81% → 98%, MRR 0.81 → 0.97.
 - **Chunk overlap doesn't carry document-level context.** A chunk from the middle of an archived policy doesn't say "archived"; only something like a header does.
 - **Retrieval metrics alone would have picked the wrong setting.** The configuration with the best retrieval per token gave the weakest answers.
 - **The reranker wasn't worth it at this scale:** it only improved the first position, didn't filter outdated documents, and added 2–14 s per query on CPU.
 
-The first version of this harness (`results/v1_pilot/`) produced a confident-looking winner that turned out to be a measurement artifact; [its write-up](rag/evaluation/results/v1_pilot/README.md) explains what was wrong. **The full write-up (findings, why small chunks win, why overlap doesn't carry document context, and the engineering problems found) is in [`docs/rag-evaluation-notes.md`](docs/rag-evaluation-notes.md).** Current tables are in `rag/evaluation/results/REPORT.md`; how to reproduce a run is in [`rag/evaluation/README.md`](rag/evaluation/README.md).
+The first version of this harness (`results/v1_pilot/`) produced a confident-looking winner that turned out to be a measurement artifact; [its write-up](rag/evaluation/results/v1_pilot/README.md) explains what was wrong. **The full write-up (method, findings, why chunk size and headers matter, why overlap doesn't carry document context, and the engineering problems found) is in [`docs/rag-evaluation-notes.md`](docs/rag-evaluation-notes.md).** Current tables are in `rag/evaluation/results/REPORT.md`; how to reproduce a run is in [`rag/evaluation/README.md`](rag/evaluation/README.md).
 
 ## Provider abstraction
 

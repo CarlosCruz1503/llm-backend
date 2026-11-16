@@ -28,6 +28,16 @@ This document records how the retrieval-augmented search in this project was eva
 
 **Chosen configuration: 256-token chunks with contextual headers, top 3, no reranker** (`medium_chunks_ctx`). It scored 4.95/5 on answers, 99% of the best configuration (whole documents, 5.00), with 37% less retrieved context, and unlike whole documents it still works when documents are long.
 
+**Takeaways for similar projects** (a small knowledge base of short, single-topic pages, such as a restaurant, a shop or a small service business):
+
+1. **Start with 256-token chunks, ~20% overlap, a contextual header on every chunk, and top 3.**
+2. **Skip the reranker on small datasets.** With a few dozen chunks the right one is usually already in the top 3, so a reranker adds seconds per query for little gain. Reconsider it for large collections.
+3. **Overlap and headers do different jobs.** Overlap keeps sentences whole at chunk boundaries; only a header tells a chunk which document, section and version it belongs to.
+4. **Choose by answer quality, not retrieval scores alone.** Retrieval metrics check that the right document arrived, not the paragraph with the answer.
+5. **Measure on your own documents.** These results depend on document length and type; the harness in this repo exists so you can rerun the comparison on yours.
+
+The details:
+
 - **The first evaluation picked the wrong winner.** It reported "reranked, top 10" as best. In fact the knowledge base was so small that top 10 sent almost all of it to the LLM, the reranker didn't remove anything, and "retrieval recall" was read from the LLM's own answer instead of from the database.
 - **Measure retrieval and generation separately.** Retrieval quality can be measured without calling the LLM. That made it possible to compare 24 configurations on a free tier of 20 LLM requests a day.
 - **Small chunks (128 tokens) with top 3 gave the best retrieval per token:** every answerable question got a relevant document, with 96% recall and ~350 tokens of context. Whole-document chunks matched that recall at 3x the tokens. Medium chunks (256) were the worst at every small top-k.

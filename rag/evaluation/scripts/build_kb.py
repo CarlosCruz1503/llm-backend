@@ -50,11 +50,11 @@ def main():
     sources = sorted(SOURCE_DIR.glob("*.md"))
     expected = {f"{source.stem}.pdf" for source in sources}
 
-    # Drop PDFs whose source was removed, so the corpus always matches kb_source/.
-    for stale in OUTPUT_DIR.glob("*.pdf"):
-        if stale.name not in expected:
-            stale.unlink()
-            print(f"removed {stale.name}")
+    # PDFs without a Markdown source may be documents someone added directly,
+    # so they are reported, never deleted.
+    for other in sorted(OUTPUT_DIR.glob("*.pdf")):
+        if other.name not in expected:
+            print(f"note: {other.name} has no source in kb_source/ and is part of the knowledge base")
 
     for source in sources:
         pdf = render(source.read_text(encoding="utf-8"))
