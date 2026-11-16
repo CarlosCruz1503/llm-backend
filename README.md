@@ -71,6 +71,8 @@ The sample knowledge base is a fictional restaurant: 20 short pages (menu, polic
 
 It scored 4.95/5 on answers, the same quality as sending whole documents, with 37% less context.
 
+These are the API's defaults (`myapp/constants.py`), so new uploads use them unless you override them.
+
 **General lessons:**
 
 - **A reranker doesn't pay off on small datasets.** With only a few dozen chunks, the right one is usually already in the top 3, so the reranker mostly reorders them and adds 2–14 seconds per query on CPU. It earns its cost on large collections, where the right chunk is often outside the first results.
@@ -383,3 +385,7 @@ Being upfront about the current gaps rather than hiding them:
 - **No tool calling or provider fallback.** Each request commits to one provider up front; there's no retry-on-a-different-provider if it's down, and no function/tool-calling support yet.
 - **No cost or usage analytics.** Token counts are recorded per-message/search (`input_tokens`/`output_tokens`/`total_tokens`), but nothing aggregates them into cost or usage dashboards.
 - **No structured observability.** Logging is console-only (see `LOGGING` in `myapp/settings.py`); no tracing/metrics export.
+
+## License
+
+MIT, see [LICENSE](LICENSE).

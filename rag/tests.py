@@ -10,6 +10,7 @@ from rag.models.document import DocumentModel
 from rag.models.document_chunk import DocumentChunkModel
 from rag.models.search import SearchModel
 from rag.services.chunks import build_chunk_headers, create_and_save_chunks, document_title
+from rag.services.document import ChunkService
 from rag.services.evaluation import score_retrieval, summarize_retrieval
 from rag.services.search import SearchService, retrieve_chunks
 from rag.tasks import task_finalize_document, task_process_chunk
@@ -281,3 +282,15 @@ class ContextualChunkHeaderTests(TestCase):
 
         self.assertTrue(all(chunk.header is None for chunk in chunks))
         self.assertEqual(chunks[0].contextual_text, chunks[0].text)
+
+    @patch("rag.services.chunks.extract_lines", return_value=ARCHIVE_TEXT.splitlines())
+    def test_api_uploads_use_the_chosen_configuration_by_default(self, _extract_lines):
+        # No overrides, as for a regular API upload: 256-token chunks with headers.
+        document = _create_document(file_name="archive.pdf", text_content=self.FLAT_TEXT * 20)
+
+        chunks = ChunkService().process_chunks(document.id)
+
+        self.assertEqual(int(chunks[0].token_size), 256)
+        self.assertEqual(int(chunks[0].token_overlap), 48)
+        self.assertTrue(all(chunk.header for chunk in chunks))
+

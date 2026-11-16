@@ -20,7 +20,7 @@ def add(x, y):
              max_retries=3,
              retry_backoff=4)
 def task_process_document(self, document_id: int, chunk_model=None, chunk_size=None, chunk_overlap=None,
-                          contextual_headers=False) -> int:
+                          contextual_headers=None) -> int:
     # Returns the document's id rather than the DocumentModel instance
     # itself: Celery stores every task's return value in the result backend
     # via JSON, and a Django model instance isn't JSON-serializable (it
@@ -57,7 +57,7 @@ def task_process_document(self, document_id: int, chunk_model=None, chunk_size=N
              max_retries=3,
              retry_backoff=4)
 def task_create_and_process_chunks(self, document_id: int, chunk_model=None, chunk_size=None, chunk_overlap=None,
-                                   contextual_headers=False) -> None:
+                                   contextual_headers=None) -> None:
     chunk_service = ChunkService()
     try:
         chunks = chunk_service.process_chunks(

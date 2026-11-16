@@ -44,13 +44,18 @@ class TokenModelChoices(models.TextChoices):
     
 DEFAULT_TOKEN_MODEL = TokenModelChoices.cl100k_base
 
-MAX_TOKENS_FOR_CHUNK = 500
+# Chunking and retrieval defaults chosen by the RAG evaluation for small knowledge
+# bases of short pages (see docs/rag-evaluation-notes.md): 256-token chunks, ~20%
+# overlap, a contextual header on every chunk, top 3.
+MAX_TOKENS_FOR_CHUNK = 256
 
-DEFAULT_OVERLAP_TOKENS_FOR_CHUNK = 75
+DEFAULT_OVERLAP_TOKENS_FOR_CHUNK = 48
+
+DEFAULT_CONTEXTUAL_HEADERS = True
 
 DEFAULT_EMBEDDING_DIMENTIONS = os.environ.get("DEFAULT_EMBEDDING_DIMENTIONS")
 
-DEFAULT_TOP_K_RETRIEVE_SIZE = 8
+DEFAULT_TOP_K_RETRIEVE_SIZE = 3
 
 # With the reranker enabled, top_k is the candidate pool pulled from pgvector
 # and only the best RERANK_TOP_N of those are sent to the LLM.
